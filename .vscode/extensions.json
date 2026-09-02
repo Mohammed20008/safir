@@ -1,5 +1,6 @@
 {
  "recommendations": [
+  "bradlc.vscode-tailwindcss",
   "google.gemini-cli-vscode-ide-companion"
  ]
 }
