@@ -92,18 +92,53 @@ function buildSurahCache(
   // 1. Sort all word items sequentially by their canonical Quran word ID (1..77430)
   const sortedItems = Object.values(allData).sort((a, b) => Number(a.id) - Number(b.id));
 
-  // 2. Walk page 1 to 604 through the layout definition to assign exact page & line
-  let itemPtr = 0;
-  for (let p = 1; p <= 604; p++) {
-    const lines = layoutLinesMap[String(p)] || [];
-    for (let lineIdx = 0; lineIdx < lines.length; lineIdx++) {
-      const tokens = lines[lineIdx].trim().split(/\s+/).filter(Boolean);
-      for (const token of tokens) {
-        if (itemPtr < sortedItems.length) {
-          sortedItems[itemPtr].page = p;
-          sortedItems[itemPtr].line = lineIdx;
-          sortedItems[itemPtr].layoutText = token;
-          itemPtr++;
+  // 2. Walk page 1 to 604 through the layout definition per-page using mapping to prevent line drift
+  if (mapping && Object.keys(mapping).length > 0) {
+    const verseItemsMap: Record<string, QPCItem[]> = {};
+    sortedItems.forEach((item) => {
+      const vk = `${item.surah}:${item.ayah}`;
+      if (!verseItemsMap[vk]) verseItemsMap[vk] = [];
+      verseItemsMap[vk].push(item);
+    });
+
+    const itemsByPage: Record<number, QPCItem[]> = {};
+    for (let p = 1; p <= 604; p++) itemsByPage[p] = [];
+
+    Object.entries(mapping).forEach(([vk, p]) => {
+      if (verseItemsMap[vk]) {
+        itemsByPage[p].push(...verseItemsMap[vk]);
+      }
+    });
+
+    for (let p = 1; p <= 604; p++) {
+      const pageWords = itemsByPage[p];
+      const lines = layoutLinesMap[String(p)] || [];
+      let wordPtr = 0;
+      for (let lineIdx = 0; lineIdx < lines.length; lineIdx++) {
+        const tokens = lines[lineIdx].trim().split(/\s+/).filter(Boolean);
+        for (const token of tokens) {
+          if (wordPtr < pageWords.length) {
+            pageWords[wordPtr].page = p;
+            pageWords[wordPtr].line = lineIdx;
+            pageWords[wordPtr].layoutText = token;
+            wordPtr++;
+          }
+        }
+      }
+    }
+  } else {
+    let itemPtr = 0;
+    for (let p = 1; p <= 604; p++) {
+      const lines = layoutLinesMap[String(p)] || [];
+      for (let lineIdx = 0; lineIdx < lines.length; lineIdx++) {
+        const tokens = lines[lineIdx].trim().split(/\s+/).filter(Boolean);
+        for (const token of tokens) {
+          if (itemPtr < sortedItems.length) {
+            sortedItems[itemPtr].page = p;
+            sortedItems[itemPtr].line = lineIdx;
+            sortedItems[itemPtr].layoutText = token;
+            itemPtr++;
+          }
         }
       }
     }

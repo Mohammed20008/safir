@@ -378,7 +378,7 @@ export default function QuranReader({
         surahsToLoad.map(async (n) => {
           const cacheKey = `${layout}-${n}`;
           if (!qpcCache[cacheKey]) {
-            const cachedQPC = await getPersistentCache<QPCVerseData[]>(`qpc_v9_${cacheKey}`);
+            const cachedQPC = await getPersistentCache<QPCVerseData[]>(`qpc_v10_${cacheKey}`);
             if (cachedQPC) qpcCache[cacheKey] = cachedQPC;
           }
           if (!versesCache[n]) {
@@ -423,7 +423,7 @@ export default function QuranReader({
           if (qpcCache[cacheKey]) return qpcCache[cacheKey];
           const data = await fetchSurahQPCData(n, layout);
           qpcCache[cacheKey] = data;
-          setPersistentCache(`qpc_v9_${cacheKey}`, data);
+          setPersistentCache(`qpc_v10_${cacheKey}`, data);
           return data;
         });
 
@@ -475,11 +475,11 @@ export default function QuranReader({
           for (const n of neighbors) {
             const cacheKey = `${layout}-${n}`;
             if (!qpcCache[cacheKey]) {
-              const cached = await getPersistentCache<QPCVerseData[]>(`qpc_${cacheKey}`);
+              const cached = await getPersistentCache<QPCVerseData[]>(`qpc_v10_${cacheKey}`);
               if (!cached) {
                 fetchSurahQPCData(n, layout).then((data) => {
                   qpcCache[cacheKey] = data;
-                  setPersistentCache(`qpc_${cacheKey}`, data);
+                  setPersistentCache(`qpc_v10_${cacheKey}`, data);
                 });
               } else {
                 qpcCache[cacheKey] = cached;
