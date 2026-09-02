@@ -130,7 +130,7 @@ export default function GameRoutePage({ params }: GamePageProps) {
 
   return (
     <div style={{ minHeight: '100vh', background: 'var(--background)', padding: '2rem 1rem', position: 'relative' }}>
-      <GeometricPattern className="patternBg fixed" />
+      <GeometricPattern fixed={true} />
 
       <div style={{ maxWidth: '1200px', margin: '0 auto', position: 'relative', zIndex: 1 }}>
         {/* Navigation Breadcrumb Bar */}

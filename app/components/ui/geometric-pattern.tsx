@@ -5,11 +5,12 @@ import React from 'react';
 interface GeometricPatternProps {
   showOverlay?: boolean;
   fixed?: boolean;
+  className?: string;
 }
 
-export default function GeometricPattern({ showOverlay = true, fixed = false }: GeometricPatternProps) {
+export default function GeometricPattern({ showOverlay = true, fixed = false, className = '' }: GeometricPatternProps) {
   return (
-    <div className={`patternBg ${fixed ? 'fixed' : ''}`}>
+    <div className={`patternBg ${fixed ? 'fixed' : ''} ${className}`}>
       <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
         <defs>
           <pattern
