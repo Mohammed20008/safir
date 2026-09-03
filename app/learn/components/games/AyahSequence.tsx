@@ -226,25 +226,26 @@ export default function AyahSequence({ styles, onAwardXp, onBackToArcade }: Ayah
   };
 
   return (
-    <div style={{ maxWidth: '800px', margin: '0 auto', padding: '0 1rem' }}>
+    <div style={{ maxWidth: '800px', width: '100%', margin: '0 auto', padding: '0 0.5rem' }}>
       {/* Top Bar */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem', flexWrap: 'wrap', gap: '0.5rem' }}>
         <button
           onClick={onBackToArcade}
           style={{
             background: 'rgba(255, 255, 255, 0.9)',
             border: '2px solid var(--border)',
-            padding: '0.5rem 1.25rem',
+            padding: '0.4rem 1rem',
             borderRadius: '50px',
             fontWeight: 800,
             cursor: 'pointer',
             color: 'var(--foreground)',
+            fontSize: '0.85rem',
           }}
         >
           ⬅️ Back to Arcade
         </button>
 
-        <div style={{ display: 'flex', gap: '0.5rem' }}>
+        <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap' }}>
           {SURAH_GAMES.map((s, idx) => (
             <button
               key={s.id}
@@ -253,10 +254,10 @@ export default function AyahSequence({ styles, onAwardXp, onBackToArcade }: Ayah
                 background: currentSurahIdx === idx ? 'linear-gradient(135deg, #059669 0%, #10b981 100%)' : 'var(--card-bg)',
                 color: currentSurahIdx === idx ? '#fff' : 'var(--foreground)',
                 border: '2px solid ' + (currentSurahIdx === idx ? '#059669' : 'var(--border)'),
-                padding: '0.4rem 0.9rem',
+                padding: '0.35rem 0.75rem',
                 borderRadius: '16px',
                 fontWeight: 700,
-                fontSize: '0.85rem',
+                fontSize: '0.8rem',
                 cursor: 'pointer',
               }}
             >
@@ -271,14 +272,14 @@ export default function AyahSequence({ styles, onAwardXp, onBackToArcade }: Ayah
           textAlign: 'center',
           background: 'linear-gradient(135deg, rgba(236, 253, 245, 0.9) 0%, rgba(209, 250, 229, 0.9) 100%)',
           borderRadius: '24px',
-          padding: '2.5rem 1.5rem',
+          padding: '2rem 1rem',
           border: '3px dashed #10b981',
         }}>
-          <div style={{ fontSize: '4rem', marginBottom: '1rem' }}>📖 Ayah Sequence Master</div>
-          <h2 style={{ fontSize: '2rem', fontWeight: 900, color: '#047857', marginBottom: '0.5rem' }}>
+          <div style={{ fontSize: '3rem', marginBottom: '0.75rem' }}>📖 Ayah Sequence Master</div>
+          <h2 style={{ fontSize: '1.6rem', fontWeight: 900, color: '#047857', marginBottom: '0.5rem' }}>
             Surah Ayah Sequence Master
           </h2>
-          <p style={{ color: '#065f46', maxWidth: '520px', margin: '0 auto 2rem', fontSize: '1.05rem' }}>
+          <p style={{ color: '#065f46', maxWidth: '520px', margin: '0 auto 1.5rem', fontSize: '0.95rem' }}>
             Can you assemble the scrambled Ayahs of short Surahs into their exact recitation order? Listen to audio hints and master the Quran!
           </p>
 
@@ -288,10 +289,10 @@ export default function AyahSequence({ styles, onAwardXp, onBackToArcade }: Ayah
               background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
               color: '#fff',
               border: 'none',
-              padding: '0.85rem 2.5rem',
+              padding: '0.75rem 2rem',
               borderRadius: '50px',
               fontWeight: 900,
-              fontSize: '1.2rem',
+              fontSize: '1.1rem',
               cursor: 'pointer',
               boxShadow: '0 8px 24px rgba(16, 185, 129, 0.4)',
             }}
@@ -306,47 +307,49 @@ export default function AyahSequence({ styles, onAwardXp, onBackToArcade }: Ayah
           {/* Header */}
           <div style={{
             background: 'var(--card-bg)',
-            padding: '1rem 1.5rem',
+            padding: '0.75rem 1.25rem',
             borderRadius: '20px',
             border: '2px solid var(--border)',
-            marginBottom: '1.5rem',
+            marginBottom: '1.25rem',
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',
+            flexWrap: 'wrap',
+            gap: '0.5rem',
           }}>
             <div>
-              <h3 style={{ fontSize: '1.5rem', fontWeight: 900, color: '#059669', margin: 0 }}>
+              <h3 style={{ fontSize: '1.3rem', fontWeight: 900, color: '#059669', margin: 0 }}>
                 {surah.name} ({surah.transliteration})
               </h3>
-              <span style={{ fontSize: '0.9rem', color: 'var(--foreground-secondary)' }}>
+              <span style={{ fontSize: '0.85rem', color: 'var(--foreground-secondary)' }}>
                 {surah.translation} • {surah.ayahs.length} Ayahs
               </span>
             </div>
-            <div style={{ fontWeight: 800, color: '#059669', fontSize: '1.1rem' }}>
+            <div style={{ fontWeight: 800, color: '#059669', fontSize: '1rem' }}>
               +{surah.xp} XP
             </div>
           </div>
 
           {/* Placed Slot Container */}
-          <div style={{ marginBottom: '2rem' }}>
-            <h4 style={{ fontWeight: 800, marginBottom: '0.75rem', color: 'var(--foreground)' }}>
+          <div style={{ marginBottom: '1.5rem' }}>
+            <h4 style={{ fontWeight: 800, marginBottom: '0.5rem', color: 'var(--foreground)', fontSize: '0.95rem' }}>
               📥 Your Arranged Surah (Click Ayah to remove):
             </h4>
 
             <div style={{
-              minHeight: '140px',
+              minHeight: '120px',
               background: 'rgba(5, 150, 105, 0.05)',
               border: '3px dashed #10b981',
               borderRadius: '20px',
-              padding: '1rem',
+              padding: '0.75rem',
               display: 'flex',
               flexDirection: 'column',
-              gap: '0.75rem',
+              gap: '0.6rem',
               transition: 'transform 0.2s',
               transform: shakeActive ? 'translateX(-8px)' : 'none',
             }}>
               {placedAyahs.length === 0 ? (
-                <div style={{ textAlign: 'center', padding: '2rem', color: '#059669', fontWeight: 700 }}>
+                <div style={{ textAlign: 'center', padding: '1.5rem 0.5rem', color: '#059669', fontWeight: 700, fontSize: '0.9rem' }}>
                   Click Ayahs below to place them here in order from Verse 1 onwards! 👇
                 </div>
               ) : (
@@ -358,34 +361,38 @@ export default function AyahSequence({ styles, onAwardXp, onBackToArcade }: Ayah
                       background: '#fff',
                       border: '2px solid #10b981',
                       borderRadius: '14px',
-                      padding: '0.85rem 1.25rem',
+                      padding: '0.75rem 1rem',
                       display: 'flex',
                       justifyContent: 'space-between',
                       alignItems: 'center',
                       cursor: 'pointer',
                       boxShadow: '0 4px 12px rgba(16, 185, 129, 0.1)',
+                      flexWrap: 'wrap',
+                      gap: '0.5rem',
                     }}
                   >
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', minWidth: 0, flex: 1 }}>
                       <span style={{
                         background: '#10b981',
                         color: '#fff',
-                        width: '28px',
-                        height: '28px',
+                        width: '26px',
+                        height: '26px',
                         borderRadius: '50%',
                         display: 'inline-flex',
                         alignItems: 'center',
                         justifyContent: 'center',
                         fontWeight: 900,
-                        fontSize: '0.85rem',
+                        fontSize: '0.8rem',
+                        flexShrink: 0,
                       }}>
                         {index + 1}
                       </span>
                       <span style={{
-                        fontSize: '1.35rem',
-                        fontFamily: "'Amiri', var(--font-arabic), serif",
+                        fontSize: 'clamp(1.05rem, 3.5vw, 1.35rem)',
+                        fontFamily: "'Tufuli Arabic', var(--font-tufuli), var(--font-arabic), serif",
                         fontWeight: 700,
                         color: '#047857',
+                        lineHeight: 1.4,
                       }}>
                         {ayah.text}
                       </span>
@@ -400,11 +407,12 @@ export default function AyahSequence({ styles, onAwardXp, onBackToArcade }: Ayah
                         background: 'rgba(16, 185, 129, 0.15)',
                         border: 'none',
                         borderRadius: '50px',
-                        padding: '0.35rem 0.75rem',
+                        padding: '0.3rem 0.75rem',
                         cursor: 'pointer',
                         fontWeight: 800,
-                        fontSize: '0.85rem',
+                        fontSize: '0.8rem',
                         color: '#047857',
+                        flexShrink: 0,
                       }}
                     >
                       🔊 Listen
@@ -416,11 +424,11 @@ export default function AyahSequence({ styles, onAwardXp, onBackToArcade }: Ayah
           </div>
 
           {/* Pool Container */}
-          <div style={{ marginBottom: '2rem' }}>
-            <h4 style={{ fontWeight: 800, marginBottom: '0.75rem', color: 'var(--foreground)' }}>
+          <div style={{ marginBottom: '1.5rem' }}>
+            <h4 style={{ fontWeight: 800, marginBottom: '0.5rem', color: 'var(--foreground)', fontSize: '0.95rem' }}>
               🧩 Available Scrambled Ayahs (Click to select):
             </h4>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
               {poolAyahs.map((ayah) => (
                 <div
                   key={ayah.id}
@@ -429,19 +437,24 @@ export default function AyahSequence({ styles, onAwardXp, onBackToArcade }: Ayah
                     background: 'var(--card-bg)',
                     border: '2px solid var(--border)',
                     borderRadius: '14px',
-                    padding: '0.85rem 1.25rem',
+                    padding: '0.75rem 1rem',
                     display: 'flex',
                     justifyContent: 'space-between',
                     alignItems: 'center',
                     cursor: 'pointer',
                     boxShadow: '0 4px 12px rgba(0, 0, 0, 0.04)',
                     transition: 'all 0.2s',
+                    flexWrap: 'wrap',
+                    gap: '0.5rem',
                   }}
                 >
                   <span style={{
-                    fontSize: '1.35rem',
-                    fontFamily: "'Amiri', var(--font-arabic), serif",
+                    fontSize: 'clamp(1.05rem, 3.5vw, 1.35rem)',
+                    fontFamily: "'Tufuli Arabic', var(--font-tufuli), var(--font-arabic), serif",
                     fontWeight: 700,
+                    lineHeight: 1.4,
+                    flex: 1,
+                    minWidth: 0,
                   }}>
                     {ayah.text}
                   </span>

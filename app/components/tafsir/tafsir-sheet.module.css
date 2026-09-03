@@ -551,3 +551,29 @@
   width: 45%;
 }
 
+/* Mobile & Tablet Responsive Enhancements */
+@media (max-width: 640px) {
+  .sheet {
+    height: 92vh;
+    border-top-left-radius: 20px;
+    border-top-right-radius: 20px;
+  }
+
+  .header {
+    padding: 12px 16px;
+  }
+
+  .tabsContainer {
+    padding: 0 12px;
+  }
+
+  .content {
+    padding: 16px 12px;
+  }
+
+  .tafsirGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+

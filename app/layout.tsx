@@ -1,6 +1,13 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import localFont from "next/font/local";
 import "./globals.css";
+
+const tufuliArabic = localFont({
+  src: "../lib/fonts/TufuliArabicDEMO-Regular.otf",
+  variable: "--font-tufuli",
+  display: "swap",
+});
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -62,7 +69,7 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <head />
       <body
-        className={`${geistSans.variable} ${geistMono.variable} ${amiri.variable} ${amiri.className} ${scheherazade.className} ${inter.className} ${cairo.className} antialiased`}
+        className={`${tufuliArabic.variable} ${tufuliArabic.className} ${geistSans.variable} ${geistMono.variable} ${amiri.variable} ${inter.className} antialiased`}
         suppressHydrationWarning
       >
         <Providers>

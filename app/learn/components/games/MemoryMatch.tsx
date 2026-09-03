@@ -267,15 +267,15 @@ export default function MemoryMatch({ styles, onAwardXp, onBackToArcade }: Memor
   };
 
   return (
-    <div style={{ maxWidth: '800px', margin: '0 auto', padding: '0 1rem' }}>
+    <div style={{ maxWidth: '800px', width: '100%', margin: '0 auto', padding: '0 0.5rem' }}>
       {/* Navigation Header */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem', gap: '0.5rem', flexWrap: 'wrap' }}>
         <button
           onClick={onBackToArcade}
           style={{
             background: 'rgba(255, 255, 255, 0.9)',
             border: '2px solid var(--border)',
-            padding: '0.5rem 1.25rem',
+            padding: '0.4rem 1rem',
             borderRadius: '50px',
             fontWeight: 800,
             cursor: 'pointer',
@@ -284,12 +284,13 @@ export default function MemoryMatch({ styles, onAwardXp, onBackToArcade }: Memor
             alignItems: 'center',
             gap: '0.5rem',
             boxShadow: '0 4px 12px rgba(0, 0, 0, 0.05)',
+            fontSize: '0.9rem',
           }}
         >
           ⬅️ Back to Arcade
         </button>
 
-        <div style={{ display: 'flex', gap: '0.5rem' }}>
+        <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap' }}>
           {LEVELS.map((lvl, idx) => (
             <button
               key={lvl.id}
@@ -298,10 +299,10 @@ export default function MemoryMatch({ styles, onAwardXp, onBackToArcade }: Memor
                 background: currentLevelIdx === idx ? 'linear-gradient(135deg, #ec4899 0%, #d946ef 100%)' : 'var(--card-bg)',
                 color: currentLevelIdx === idx ? '#fff' : 'var(--foreground)',
                 border: '2px solid ' + (currentLevelIdx === idx ? '#ec4899' : 'var(--border)'),
-                padding: '0.4rem 0.9rem',
+                padding: '0.35rem 0.75rem',
                 borderRadius: '16px',
                 fontWeight: 700,
-                fontSize: '0.85rem',
+                fontSize: '0.8rem',
                 cursor: 'pointer',
               }}
             >
@@ -316,14 +317,14 @@ export default function MemoryMatch({ styles, onAwardXp, onBackToArcade }: Memor
           textAlign: 'center',
           background: 'linear-gradient(135deg, rgba(253, 242, 248, 0.9) 0%, rgba(250, 232, 255, 0.9) 100%)',
           borderRadius: '24px',
-          padding: '2.5rem 1.5rem',
+          padding: '2rem 1rem',
           border: '3px dashed #f472b6',
         }}>
-          <div style={{ fontSize: '4rem', marginBottom: '1rem' }}>🧠 Flip & Match!</div>
-          <h2 style={{ fontSize: '2rem', fontWeight: 900, color: '#be185d', marginBottom: '0.5rem' }}>
+          <div style={{ fontSize: '3rem', marginBottom: '0.75rem' }}>🧠 Flip & Match!</div>
+          <h2 style={{ fontSize: '1.6rem', fontWeight: 900, color: '#be185d', marginBottom: '0.5rem' }}>
             Tajweed & Letter Memory Match
           </h2>
-          <p style={{ color: '#9d174d', maxWidth: '500px', margin: '0 auto 2rem', fontSize: '1.05rem' }}>
+          <p style={{ color: '#9d174d', maxWidth: '500px', margin: '0 auto 1.5rem', fontSize: '0.95rem' }}>
             Test your memory! Flip the cards to find matching Arabic letters, diacritic sounds, and Tajweed symbols!
           </p>
 
@@ -333,10 +334,10 @@ export default function MemoryMatch({ styles, onAwardXp, onBackToArcade }: Memor
               background: 'linear-gradient(135deg, #ec4899 0%, #db2777 100%)',
               color: '#fff',
               border: 'none',
-              padding: '0.85rem 2.5rem',
+              padding: '0.75rem 2rem',
               borderRadius: '50px',
               fontWeight: 900,
-              fontSize: '1.2rem',
+              fontSize: '1.1rem',
               cursor: 'pointer',
               boxShadow: '0 8px 24px rgba(236, 72, 153, 0.4)',
             }}
@@ -354,16 +355,19 @@ export default function MemoryMatch({ styles, onAwardXp, onBackToArcade }: Memor
             justifyContent: 'space-between',
             alignItems: 'center',
             background: 'var(--card-bg)',
-            padding: '0.75rem 1.5rem',
+            padding: '0.6rem 1rem',
             borderRadius: '18px',
             border: '2px solid var(--border)',
-            marginBottom: '1.5rem',
+            marginBottom: '1rem',
+            flexWrap: 'wrap',
+            gap: '0.5rem',
+            fontSize: '0.9rem',
           }}>
             <div>
-              <span style={{ fontWeight: 800, color: '#ec4899', fontSize: '1.1rem' }}>Level {level.id}: </span>
+              <span style={{ fontWeight: 800, color: '#ec4899' }}>Level {level.id}: </span>
               <span style={{ fontWeight: 700 }}>{level.name}</span>
             </div>
-            <div style={{ display: 'flex', gap: '1.5rem', fontWeight: 800 }}>
+            <div style={{ display: 'flex', gap: '1rem', fontWeight: 800 }}>
               <div>Moves: <span style={{ color: '#d946ef' }}>{moves}</span></div>
               <div>Pairs: <span style={{ color: '#10b981' }}>{matchedPairsCount} / {level.pairs.length}</span></div>
             </div>
@@ -372,8 +376,8 @@ export default function MemoryMatch({ styles, onAwardXp, onBackToArcade }: Memor
           {/* Cards Grid */}
           <div style={{
             display: 'grid',
-            gridTemplateColumns: level.gridSize === '3x4' ? 'repeat(4, 1fr)' : 'repeat(4, 1fr)',
-            gap: '0.85rem',
+            gridTemplateColumns: 'repeat(4, 1fr)',
+            gap: '0.5rem',
             perspective: '1000px',
           }}>
             {cards.map((card) => {
@@ -383,8 +387,8 @@ export default function MemoryMatch({ styles, onAwardXp, onBackToArcade }: Memor
                   key={card.id}
                   onClick={() => handleCardClick(card)}
                   style={{
-                    height: '110px',
-                    borderRadius: '16px',
+                    height: 'clamp(75px, 18vw, 105px)',
+                    borderRadius: '14px',
                     cursor: card.isMatched ? 'default' : 'pointer',
                     position: 'relative',
                     transformStyle: 'preserve-3d',
@@ -398,14 +402,14 @@ export default function MemoryMatch({ styles, onAwardXp, onBackToArcade }: Memor
                     inset: 0,
                     backfaceVisibility: 'hidden',
                     background: 'linear-gradient(135deg, #f472b6 0%, #c084fc 100%)',
-                    borderRadius: '16px',
+                    borderRadius: '14px',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
                     color: '#fff',
-                    fontSize: '2rem',
-                    boxShadow: '0 6px 16px rgba(244, 114, 182, 0.3)',
-                    border: '3px solid #fff',
+                    fontSize: '1.5rem',
+                    boxShadow: '0 4px 12px rgba(244, 114, 182, 0.3)',
+                    border: '2px solid #fff',
                   }}>
                     ✨
                   </div>
@@ -417,17 +421,18 @@ export default function MemoryMatch({ styles, onAwardXp, onBackToArcade }: Memor
                     backfaceVisibility: 'hidden',
                     transform: 'rotateY(180deg)',
                     background: card.isMatched ? 'linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%)' : '#fff',
-                    borderRadius: '16px',
+                    borderRadius: '14px',
                     display: 'flex',
                     flexDirection: 'column',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    border: '3px solid ' + (card.isMatched ? '#10b981' : '#ec4899'),
-                    boxShadow: card.isMatched ? '0 6px 16px rgba(16, 185, 129, 0.2)' : '0 6px 16px rgba(236, 72, 153, 0.2)',
+                    padding: '2px',
+                    border: '2.5px solid ' + (card.isMatched ? '#10b981' : '#ec4899'),
+                    boxShadow: card.isMatched ? '0 4px 12px rgba(16, 185, 129, 0.2)' : '0 4px 12px rgba(236, 72, 153, 0.2)',
                   }}>
                     <span style={{
-                      fontSize: level.id === 3 ? '2rem' : '2.25rem',
-                      fontFamily: "'Amiri', var(--font-arabic), serif",
+                      fontSize: 'clamp(1.2rem, 4vw, 2rem)',
+                      fontFamily: "'Tufuli Arabic', var(--font-tufuli), var(--font-arabic), serif",
                       color: card.isMatched ? '#047857' : '#be185d',
                       fontWeight: 900,
                       lineHeight: 1.1,
@@ -435,7 +440,7 @@ export default function MemoryMatch({ styles, onAwardXp, onBackToArcade }: Memor
                       {card.content}
                     </span>
                     {card.subtext && (
-                      <span style={{ fontSize: '0.75rem', fontWeight: 800, color: card.isMatched ? '#065f46' : '#9d174d', marginTop: '2px' }}>
+                      <span style={{ fontSize: 'clamp(0.6rem, 2vw, 0.75rem)', fontWeight: 800, color: card.isMatched ? '#065f46' : '#9d174d', marginTop: '1px', textAlign: 'center', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '100%' }}>
                         {card.subtext}
                       </span>
                     )}
