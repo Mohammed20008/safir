@@ -1,21 +1,23 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import styles from "./page.module.css";
-import { Calendar as CalendarIcon } from "lucide-react";
+import { Calendar as CalendarIcon, Menu as MenuIcon, X as XIcon } from "lucide-react";
 import { useAuth } from "@/app/context/auth-context";
 import { useArticles } from "@/app/context/article-context";
 import GeometricPattern from "@/app/components/ui/geometric-pattern";
 
 const Navbar = () => {
   const { isAuthenticated, openAuthModal, isAdmin } = useAuth();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
     <nav className={styles.navbar}>
       <div className={styles.navContent}>
-        <div className={styles.logo}>
+        <Link href="/" className={styles.logo}>
           <div className={styles.logoIcon}>
             <svg
               width="24"
@@ -33,7 +35,9 @@ const Navbar = () => {
             <span className={styles.brandName}>QuranMaster</span>
             <span className={styles.brandBadge}>Premium</span>
           </div>
-        </div>
+        </Link>
+
+        {/* Desktop Navigation Links */}
         <div className={styles.navLinks}>
           <Link href="/quran" className={styles.navLink}>
             Read Quran
@@ -62,7 +66,63 @@ const Navbar = () => {
             </button>
           )}
         </div>
+
+        {/* Mobile Navigation Toggle Button */}
+        <button
+          className={styles.mobileMenuToggle}
+          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          aria-label="Toggle Menu"
+        >
+          {mobileMenuOpen ? <XIcon size={24} /> : <MenuIcon size={24} />}
+        </button>
       </div>
+
+      {/* Mobile Menu Drawer */}
+      <AnimatePresence>
+        {mobileMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            className={styles.mobileMenu}
+          >
+            <Link href="/quran" className={styles.mobileNavLink} onClick={() => setMobileMenuOpen(false)}>
+              Read Quran
+            </Link>
+            <Link href="/sunnah" className={styles.mobileNavLink} onClick={() => setMobileMenuOpen(false)}>
+              Sunnah
+            </Link>
+            <Link href="/calendar" className={styles.mobileNavLink} onClick={() => setMobileMenuOpen(false)}>
+              Calendar
+            </Link>
+            <Link href="/learn" className={styles.mobileNavLink} onClick={() => setMobileMenuOpen(false)}>
+              Learn
+            </Link>
+            <div className={styles.mobileMenuAuth}>
+              {isAuthenticated ? (
+                <Link
+                  href={isAdmin ? "/admin" : "/dashboard"}
+                  className={styles.dashboardBtn}
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  {isAdmin ? "Admin Dashboard" : "Dashboard"}
+                </Link>
+              ) : (
+                <button
+                  onClick={() => {
+                    openAuthModal();
+                    setMobileMenuOpen(false);
+                  }}
+                  className={styles.loginBtn}
+                  style={{ width: "100%" }}
+                >
+                  Login
+                </button>
+              )}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </nav>
   );
 };

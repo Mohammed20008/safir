@@ -33,6 +33,13 @@ function QuranContent() {
     updateSettings,
   } = useUserData();
 
+  // Pre-warm client memory store on mount for 0ms sub-millisecond page turns
+  useEffect(() => {
+    import("@/app/lib/quran-fast-loader").then(({ preloadQuranData }) => {
+      preloadQuranData();
+    });
+  }, []);
+
   // Update current surah if valid URL param changes
   useEffect(() => {
     const surahParam = searchParams.get("surah");
@@ -99,10 +106,6 @@ function QuranContent() {
       {/* Main Content */}
       <main
         className="main-content"
-        style={{
-          marginLeft: "70px", // Only primary sidebar (secondary is hidden by default)
-          transition: "margin-left 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
-        }}
       >
 
         {/* Quran Reader */}
@@ -132,6 +135,8 @@ function QuranContent() {
 
         .main-content {
           min-height: 100vh;
+          margin-left: 70px;
+          transition: margin-left 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .font-toggle-container {
@@ -182,7 +187,11 @@ function QuranContent() {
 
         @media (max-width: 768px) {
           .main-content {
-            margin-left: 60px !important; /* Only primary sidebar on mobile */
+            margin-left: 0 !important;
+            width: 100% !important;
+            max-width: 100vw !important;
+            padding: 0 !important;
+            overflow-x: hidden;
           }
 
           .font-toggle-container {

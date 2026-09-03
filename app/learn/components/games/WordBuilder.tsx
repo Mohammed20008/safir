@@ -335,9 +335,9 @@ export default function WordBuilder({ styles, onAwardXp, onBackToArcade }: WordB
   return (
     <div style={{
       width: '100%',
-      minHeight: '680px',
+      minHeight: 'min(650px, 85vh)',
       background: 'linear-gradient(135deg, #0f172a 0%, #1e1b4b 40%, #854d0e 100%)',
-      borderRadius: '28px',
+      borderRadius: '24px',
       boxShadow: '0 20px 50px rgba(0, 0, 0, 0.4)',
       position: 'relative',
       overflow: 'hidden',

@@ -37,7 +37,7 @@ export default function QPCFontLoader({ pages, mushafLayout = 'v1' }: QPCFontLoa
           @font-face {
             font-family: 'QPC_Page_${page}';
             src: url('${getFontUrl(page)}') format('woff2');
-            font-display: block;
+            font-display: swap;
           }
           .qpc-page-${page} {
             font-family: 'QPC_Page_${page}', sans-serif !important;

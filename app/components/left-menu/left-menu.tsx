@@ -15,6 +15,7 @@ import { useAudio } from '@/app/context/audio-context';
 import { reciters, Reciter } from '@/data/reciters';
 import { ViewMode } from '@/app/components/quran-reader/quran-reader.types';
 import { motion, AnimatePresence } from 'framer-motion';
+import WhiteboardModal from '../whiteboard/WhiteboardModal';
 
 export interface PlaybackOption {
   id: string;
@@ -72,6 +73,8 @@ export default function LeftMenu({
   const [searchQuery, setSearchQuery] = useState('');
   const [activeSection, setActiveSection] = useState<MenuSection | null>(null);
   const [showUserMenu, setShowUserMenu] = useState(false);
+  const [isMobileDrawerOpen, setIsMobileDrawerOpen] = useState(false);
+  const [isWhiteboardOpen, setIsWhiteboardOpen] = useState(false);
   const { user, isAdmin, openAuthModal, logout } = useAuth();
   const { unreadTotal, openChat } = useChat();
   const secondarySidebarRef = useRef<HTMLDivElement>(null);
@@ -92,8 +95,19 @@ export default function LeftMenu({
   const [, setQueuedReciter] = useState<Reciter | null>(null);
 
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const activeSurahRef = useRef<HTMLButtonElement | null>(null);
 
   const surah = surahs.find((s) => s.number === currentSurah);
+
+  // Auto-scroll current opened surah into view when Surahs menu opens or surah changes
+  useEffect(() => {
+    if (activeSection === 'surahs' && activeSurahRef.current) {
+      const timer = setTimeout(() => {
+        activeSurahRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 150);
+      return () => clearTimeout(timer);
+    }
+  }, [activeSection, currentSurah]);
 
   // Close dropdown on click outside
   useEffect(() => {
@@ -380,14 +394,57 @@ export default function LeftMenu({
 
   return (
     <>
+      {/* Floating Mobile Hamburger Menu Trigger Bar */}
+      <div className={styles.mobileTriggerBar}>
+        <button
+          className={styles.mobileHamburgerBtn}
+          onClick={() => {
+            const nextState = !isMobileDrawerOpen;
+            setIsMobileDrawerOpen(nextState);
+            if (!nextState) {
+              setActiveSection(null);
+            }
+          }}
+          aria-label="Toggle Quran Menu"
+        >
+          {isMobileDrawerOpen || activeSection ? (
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+              <path d="M18 6L6 18M6 6l12 12" />
+            </svg>
+          ) : (
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+              <line x1="3" y1="12" x2="21" y2="12" />
+              <line x1="3" y1="6" x2="21" y2="6" />
+              <line x1="3" y1="18" x2="21" y2="18" />
+            </svg>
+          )}
+          <span className={styles.mobileBtnText}>
+            {surah ? `${surah.transliteration} (${surah.number})` : 'Quran Menu'}
+          </span>
+        </button>
+
+        <div className={styles.mobileQuickActions}>
+          <button
+            className={styles.mobileQuickPlayBtn}
+            onClick={handlePlayClick}
+            aria-label={audioState.isPlaying ? "Pause Recitation" : "Play Recitation"}
+          >
+            {audioState.isPlaying ? '⏸️' : '▶️'}
+          </button>
+        </div>
+      </div>
+
       {/* Overlay to close menu when clicking outside */}
-      {activeSection && (
+      {(activeSection || isMobileDrawerOpen) && (
         <div 
           className={styles.overlay}
-          onClick={() => setActiveSection(null)}
+          onClick={() => {
+            setActiveSection(null);
+            setIsMobileDrawerOpen(false);
+          }}
         />
       )}
-      <div ref={primarySidebarRef} className={styles.primarySidebar}>
+      <div ref={primarySidebarRef} className={`${styles.primarySidebar} ${(activeSection || isMobileDrawerOpen) ? styles.mobileOpen : ''}`}>
          <div className={styles.primaryLogo}>
           <div className={styles.primaryLogoIcon}>
             <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
@@ -479,6 +536,17 @@ export default function LeftMenu({
             {unreadTotal > 0 && (
               <span className={styles.badge}>{unreadTotal}</span>
             )}
+          </button>
+
+          <button 
+            className={styles.primaryNavItem}
+            onClick={() => setIsWhiteboardOpen(true)}
+            title="Writing Practice / Whiteboard"
+          >
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M12 20h9"></path>
+              <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+            </svg>
           </button>
 
           <button 
@@ -587,7 +655,7 @@ export default function LeftMenu({
         </div>
       </div>
 
-      <div ref={secondarySidebarRef} className={`${styles.secondarySidebar} ${activeSection ? styles.open : ''}`}>
+      <div ref={secondarySidebarRef} className={`${styles.secondarySidebar} ${activeSection ? styles.open : ''} ${(activeSection || isMobileDrawerOpen) ? styles.mobileOpen : ''}`}>
         {activeSection && (
           <div className={styles.secondaryContent}>
             {activeSection === 'search' && (
@@ -671,9 +739,30 @@ export default function LeftMenu({
 
             {activeSection === 'surahs' && (
               <>
-                <div className={styles.secondaryHeader}>
-                  <h2>Surahs</h2>
-                  <p>114 Chapters</p>
+                <div className={styles.searchBox}>
+                  <svg className={styles.searchIcon} width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <path d="m21 21-4.35-4.35"></path>
+                  </svg>
+                  <input
+                    type="text"
+                    placeholder="Search Surahs..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className={styles.searchInput}
+                  />
+                  {searchQuery && (
+                    <button 
+                      className={styles.clearBtn}
+                      onClick={() => setSearchQuery('')}
+                      aria-label="Clear search"
+                    >
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                      </svg>
+                    </button>
+                  )}
                 </div>
 
                 {/* Current Surah Navigation Card */}
@@ -709,38 +798,20 @@ export default function LeftMenu({
                     </svg>
                   </button>
                 </div>
-                 <div className={styles.searchBox}>
-                  <svg className={styles.searchIcon} width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <circle cx="11" cy="11" r="8"></circle>
-                    <path d="m21 21-4.35-4.35"></path>
-                  </svg>
-                  <input
-                    type="text"
-                    placeholder="Search Surahs..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className={styles.searchInput}
-                  />
-                  {searchQuery && (
-                    <button 
-                      className={styles.clearBtn}
-                      onClick={() => setSearchQuery('')}
-                      aria-label="Clear search"
-                    >
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <line x1="18" y1="6" x2="6" y2="18"></line>
-                        <line x1="6" y1="6" x2="18" y2="18"></line>
-                      </svg>
-                    </button>
-                  )}
-                </div>
 
                 <div className={styles.surahList}>
                   {filteredSurahs.map((surah) => (
                     <button
                       key={surah.number}
+                      ref={currentSurah === surah.number ? activeSurahRef : null}
                       className={`${styles.surahItem} ${currentSurah === surah.number ? styles.active : ''}`}
-                      onClick={() => onSurahSelect(surah.number)}
+                      onClick={() => {
+                        onSurahSelect(surah.number);
+                        setIsMobileDrawerOpen(false);
+                        if (window.innerWidth < 768) {
+                          setActiveSection(null);
+                        }
+                      }}
                     >
                       <div className={styles.surahNumber}>
                         <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
@@ -1137,6 +1208,8 @@ export default function LeftMenu({
           </div>
         )}
       </AnimatePresence>
+
+      <WhiteboardModal isOpen={isWhiteboardOpen} onClose={() => setIsWhiteboardOpen(false)} />
     </>
   );
 }

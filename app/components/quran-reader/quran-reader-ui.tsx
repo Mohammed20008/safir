@@ -75,8 +75,48 @@ export function VersePopup({
   onPlay,
   onToggleTranslation,
 }: VersePopupProps) {
+  const popupRef = useRef<HTMLSpanElement>(null);
+  const [positionStyle, setPositionStyle] = useState<React.CSSProperties>({});
+
+  useEffect(() => {
+    const updatePosition = () => {
+      if (!popupRef.current) return;
+      const parent = popupRef.current.parentElement;
+      if (!parent) return;
+
+      const parentRect = parent.getBoundingClientRect();
+      const popupWidth = popupRef.current.offsetWidth || 210;
+      const screenWidth = window.innerWidth;
+
+      // Center of parent verse/word element on screen
+      const parentCenterX = parentRect.left + parentRect.width / 2;
+
+      // Safe bounds (at least 12px from left or right edge of screen)
+      const minX = 12 + popupWidth / 2;
+      const maxX = screenWidth - 12 - popupWidth / 2;
+      const clampedX = Math.max(minX, Math.min(parentCenterX, maxX));
+
+      // Calculate relative left offset from parent element's left edge
+      const relativeLeft = clampedX - parentRect.left;
+
+      setPositionStyle({
+        left: `${relativeLeft}px`,
+        transform: "translateX(-50%)",
+      });
+    };
+
+    updatePosition();
+    window.addEventListener("resize", updatePosition);
+    return () => window.removeEventListener("resize", updatePosition);
+  }, []);
+
   return (
-    <span className={styles.versePopup} onClick={(e) => e.stopPropagation()}>
+    <span
+      ref={popupRef}
+      className={styles.versePopup}
+      style={positionStyle}
+      onClick={(e) => e.stopPropagation()}
+    >
       <button
         className={styles.popupBtn}
         onClick={() => onPlay(verse)}

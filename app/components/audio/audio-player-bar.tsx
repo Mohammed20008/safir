@@ -36,6 +36,7 @@ export default function AudioPlayerBar() {
   const [showSpeedMenu, setShowSpeedMenu] = useState(false);
   const [showRepeatMenu, setShowRepeatMenu] = useState(false);
   const [showReciterMenu, setShowReciterMenu] = useState(false);
+  const [showMobileMoreMenu, setShowMobileMoreMenu] = useState(false);
   
   const progressBarRef = useRef<HTMLDivElement>(null);
   const [isDragging, setIsDragging] = useState(false);
@@ -92,15 +93,16 @@ export default function AudioPlayerBar() {
 
   // Click outside to close menus
   useEffect(() => {
-    if (!showSpeedMenu && !showRepeatMenu && !showReciterMenu) return;
+    if (!showSpeedMenu && !showRepeatMenu && !showReciterMenu && !showMobileMoreMenu) return;
     const handleOutsideClick = () => {
       setShowSpeedMenu(false);
       setShowRepeatMenu(false);
       setShowReciterMenu(false);
+      setShowMobileMoreMenu(false);
     };
     window.addEventListener('click', handleOutsideClick);
     return () => window.removeEventListener('click', handleOutsideClick);
-  }, [showSpeedMenu, showRepeatMenu, showReciterMenu]);
+  }, [showSpeedMenu, showRepeatMenu, showReciterMenu, showMobileMoreMenu]);
 
   // Switch reciter seamlessly and restart playback of the current content on the new voice
   const handleReciterChange = (reciterId: number) => {
@@ -365,6 +367,121 @@ export default function AudioPlayerBar() {
                   <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
                 </svg>
               </button>
+            </div>
+
+            {/* Mobile Options Arrow Trigger & Popup Menu (Mobile Only) */}
+            <div className={styles.mobileMoreContainer}>
+              <button
+                className={`${styles.mobileMoreBtn} ${showMobileMoreMenu ? styles.mobileMoreBtnActive : ''}`}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setShowMobileMoreMenu(!showMobileMoreMenu);
+                  setShowReciterMenu(false);
+                  setShowRepeatMenu(false);
+                  setShowSpeedMenu(false);
+                }}
+                aria-label="More Audio Options"
+                title="Audio Options"
+              >
+                <svg
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                  style={{
+                    transform: showMobileMoreMenu ? 'rotate(180deg)' : 'rotate(0deg)',
+                    transition: 'transform 0.25s ease',
+                  }}
+                >
+                  <polyline points="18 15 12 9 6 15"></polyline>
+                </svg>
+              </button>
+
+              {showMobileMoreMenu && (
+                <div className={styles.mobileMoreMenuPopup} onClick={(e) => e.stopPropagation()}>
+                  <div className={styles.mobileMenuHeader}>
+                    <span>Audio Options</span>
+                    <button
+                      className={styles.mobileMenuCloseBtn}
+                      onClick={() => setShowMobileMoreMenu(false)}
+                    >
+                      ✕
+                    </button>
+                  </div>
+
+                  {/* Reciter Selector */}
+                  <div className={styles.mobileMenuSection}>
+                    <label>Reciter</label>
+                    <select
+                      value={settings.selectedReciterId}
+                      onChange={(e) => handleReciterChange(Number(e.target.value))}
+                      className={styles.mobileSelect}
+                    >
+                      {reciters.map((r) => (
+                        <option key={r.id} value={r.id}>
+                          {r.name} ({r.subtext})
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {/* Speed Selector */}
+                  <div className={styles.mobileMenuSection}>
+                    <label>Playback Speed</label>
+                    <div className={styles.mobilePillGroup}>
+                      {speedOptions.map((rate) => (
+                        <button
+                          key={rate}
+                          className={`${styles.mobilePillOption} ${playbackRate === rate ? styles.mobilePillActive : ''}`}
+                          onClick={() => setPlaybackRate(rate)}
+                        >
+                          {rate}x
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Repeat Loop Selector */}
+                  <div className={styles.mobileMenuSection}>
+                    <label>Loop Mode</label>
+                    <div className={styles.mobilePillGroup}>
+                      {repeatOptions.map((opt) => (
+                        <button
+                          key={opt.value}
+                          className={`${styles.mobilePillOption} ${repeatCount === opt.value ? styles.mobilePillActive : ''}`}
+                          onClick={() => setRepeatCount(opt.value)}
+                        >
+                          {opt.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Action Buttons */}
+                  <div className={styles.mobileMenuActions}>
+                    <button
+                      className={styles.mobileStopBtn}
+                      onClick={() => {
+                        stop();
+                        setShowMobileMoreMenu(false);
+                      }}
+                    >
+                      ⏹️ Stop & Close
+                    </button>
+                    <button
+                      className={styles.mobileCollapseBtn}
+                      onClick={() => {
+                        setIsCollapsed(true);
+                        setShowMobileMoreMenu(false);
+                      }}
+                    >
+                      🔽 Minimize
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>

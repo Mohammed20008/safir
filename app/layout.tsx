@@ -50,8 +50,6 @@ const cairo = Cairo({
 import { Providers } from "./providers";
 import AuthModal from "./components/auth/auth-modal";
 import ChatModal from "./components/chat/chat-modal";
-import ThemeToggle from "./components/ui/theme-toggle";
-import WhiteboardButton from "./components/whiteboard/WhiteboardButton";
 import { Toaster } from "sonner";
 
 export const metadata: Metadata = {
@@ -67,7 +65,23 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <head />
+      <head>
+        <link rel="preload" href="/new_header.png" as="image" />
+        <link
+          rel="preload"
+          href="/fonts/surah-name-v2.ttf"
+          as="font"
+          type="font/ttf"
+          crossOrigin="anonymous"
+        />
+        <link
+          rel="preload"
+          href="/fonts/uthmanic_hafs_v22.ttf"
+          as="font"
+          type="font/ttf"
+          crossOrigin="anonymous"
+        />
+      </head>
       <body
         className={`${tufuliArabic.variable} ${tufuliArabic.className} ${geistSans.variable} ${geistMono.variable} ${amiri.variable} ${inter.className} antialiased`}
         suppressHydrationWarning
@@ -76,8 +90,6 @@ export default function RootLayout({
           {children}
           <AuthModal />
           <ChatModal />
-          <ThemeToggle />
-          <WhiteboardButton />
           <Toaster position="top-center" richColors closeButton />
         </Providers>
       </body>

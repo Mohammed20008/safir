@@ -82,38 +82,63 @@ export default function PageView({
     if (typeof window !== "undefined") {
       return { width: window.innerWidth, height: window.innerHeight };
     }
-    return { width: 1440, height: 900 };
+    return { width: 375, height: 667 };
   });
   const [hoveredVerseId, setHoveredVerseId] = useState<string | null>(null);
+  const [selectedVerseId, setSelectedVerseId] = useState<string | null>(null);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
+      setWindowSize({ width: window.innerWidth, height: window.innerHeight });
       const handleResize = () =>
         setWindowSize({ width: window.innerWidth, height: window.innerHeight });
       window.addEventListener("resize", handleResize);
-      return () => window.removeEventListener("resize", handleResize);
+
+      const handleGlobalClick = (e: MouseEvent | TouchEvent) => {
+        const target = e.target as HTMLElement;
+        if (target && !target.closest("[data-verse-id]") && !target.closest(`.${styles.versePopup}`)) {
+          setSelectedVerseId(null);
+          setHoveredVerseId(null);
+        }
+      };
+      document.addEventListener("click", handleGlobalClick);
+      document.addEventListener("touchstart", handleGlobalClick);
+
+      return () => {
+        window.removeEventListener("resize", handleResize);
+        document.removeEventListener("click", handleGlobalClick);
+        document.removeEventListener("touchstart", handleGlobalClick);
+      };
     }
   }, []);
 
-  // Standard Madani Mushaf page dimensions for single page mode (with tight, halved padding)
+  const isMobile = windowSize.width < 768;
+
+  // Standard Madani Mushaf page dimensions for single page mode
   const BASE_PAGE_FONT_SIZE = 26;
   const BASE_PAGE_WIDTH = mushafLayout === "v1" ? 500 : 520;
 
-  // Compute zoom ratio based on user's displayFontSize
-  const basePageZoom = displayFontSize / BASE_PAGE_FONT_SIZE;
+  // On mobile screens, maximize page width and scale text larger for maximum readability
+  const effectiveDisplayFontSize = isMobile ? Math.min(displayFontSize, 28) : displayFontSize;
 
-  // Maximum allowed width fitting viewport with safe padding
-  const maxAllowedWidth = Math.max(300, Math.min(windowSize.width - 32, 920));
+  // Compute zoom ratio based on user's displayFontSize
+  const basePageZoom = effectiveDisplayFontSize / BASE_PAGE_FONT_SIZE;
+
+  // Maximum allowed width fitting viewport on mobile
+  const maxAllowedWidth = isMobile
+    ? windowSize.width - 4
+    : Math.max(300, Math.min(windowSize.width - 32, 920));
 
   // Desired page width based on requested font size
   const desiredPageWidth = basePageZoom * BASE_PAGE_WIDTH;
 
-  // Clamped page width so it never overflows screen
-  const actualPageWidth = Math.min(desiredPageWidth, maxAllowedWidth);
+  // Page width maximized to fit within 2px side margins on mobile
+  const actualPageWidth = isMobile ? windowSize.width - 4 : Math.min(desiredPageWidth, maxAllowedWidth);
 
-  // Scaled font size strictly proportional to the actual page width
-  // This guarantees the 15 lines of text fit within the page borders with comfortable padding
-  const finalFontSize = (actualPageWidth / BASE_PAGE_WIDTH) * BASE_PAGE_FONT_SIZE;
+  // Scaled font size strictly proportional to actual page width with mobile boost
+  const finalFontSize = isMobile
+    ? Math.max((actualPageWidth / BASE_PAGE_WIDTH) * BASE_PAGE_FONT_SIZE, 18.5)
+    : (actualPageWidth / BASE_PAGE_WIDTH) * BASE_PAGE_FONT_SIZE;
   // Memoize page bucketing and active page list sorting
   const { sortedActivePages, pages } = useMemo(() => {
     // Collect all pages for this surah
@@ -375,81 +400,93 @@ export default function PageView({
               >
                 {fontMode === "qpc"
                   ? alignedLines.map((line, lIdx) => {
-                      const isEndLine = isEndOfSurahLine(line);
-                      const segments = line.words
-                        ? groupLineWordsIntoSegments(line.words)
-                        : [];
+                        const isEndLine = isEndOfSurahLine(line);
+                        const segments = line.words
+                          ? groupLineWordsIntoSegments(line.words)
+                          : [];
 
-                      return (
-                        <Fragment key={lIdx}>
-                          {line.surahHeader &&
-                            renderSurahHeader(line.surahHeader.surahNumber, pageNum)}
-                          {line.hasBasmalah && renderBasmalah()}
-                          {line.words && line.words.length > 0 && (
-                            <div
-                              className={`${styles.mushafLine} ${mushafLayout === "v4" ? styles.v4Line : ""} ${isEndLine ? styles.lastLineOfSurah : ""}`}
-                            >
-                              {segments.map((seg, sIdx) => {
-                                const verseId = seg.verseId;
-                                const isBlurred =
-                                  isTestMode && !revealedVerses.has(verseId);
-                                const isPlaying =
-                                  audioCurrentSurah === seg.words[0].surahNum &&
-                                  audioCurrentVerse === seg.words[0].verseNum;
-                                const isPaused = isPlaying && !audioIsPlaying;
+                        return (
+                          <Fragment key={lIdx}>
+                            {line.surahHeader &&
+                              renderSurahHeader(line.surahHeader.surahNumber, pageNum)}
+                            {line.hasBasmalah && renderBasmalah()}
+                            {line.words && line.words.length > 0 && (
+                              <div
+                                className={`${styles.mushafLine} ${mushafLayout === "v4" ? styles.v4Line : ""} ${isEndLine ? styles.lastLineOfSurah : ""}`}
+                              >
+                                {segments.map((seg, sIdx) => {
+                                  const verseId = seg.verseId;
+                                  const isBlurred =
+                                    isTestMode && !revealedVerses.has(verseId);
+                                  const isPlaying =
+                                    audioCurrentSurah === seg.words[0].surahNum &&
+                                    audioCurrentVerse === seg.words[0].verseNum;
+                                  const isPaused = isPlaying && !audioIsPlaying;
+                                  const isHighlighted = selectedVerseId === verseId;
+                                  const isFirstSegmentOfVerse = seg.words[0]?.word === 1;
+                                  const shouldRenderPopup = !isTestMode && selectedVerseId === verseId && isFirstSegmentOfVerse;
 
-                                const isHovered = hoveredVerseId === verseId;
-                                return (
-                                  <span
-                                    key={`${verseId}-${sIdx}`}
-                                    id={`verse-${verseId}`}
-                                    data-verse-id={verseId}
-                                    className={`${styles.pageVerse} ${isBlurred ? styles.blurred : styles.revealed} ${isPlaying ? styles.playing : ""} ${isPaused ? styles.paused : ""} ${isHovered ? styles.verseHovered : ""}`}
-                                    onMouseEnter={() => setHoveredVerseId(verseId)}
-                                    onMouseLeave={() => setHoveredVerseId(null)}
-                                    onClick={() =>
-                                      isTestMode && toggleVerseReveal(verseId)
-                                    }
-                                  >
-                                    <span className={`qpc-page-${pageNum}`}>
-                                      {seg.words.map((w, wordIdx) => (
-                                        <span
-                                          key={`${w.id}-${wordIdx}`}
-                                          className="qpc-word"
-                                        >
-                                          {w.text}
-                                          {w.spaceAfter && mushafLayout === "v1" ? "\u200B" : ""}
-                                        </span>
-                                      ))}
+                                  return (
+                                    <span
+                                      key={`${verseId}-${sIdx}`}
+                                      id={`verse-${verseId}`}
+                                      data-verse-id={verseId}
+                                      className={`${styles.pageVerse} ${isBlurred ? styles.blurred : styles.revealed} ${isPlaying ? styles.playing : ""} ${isPaused ? styles.paused : ""} ${isHighlighted ? styles.verseHovered : ""}`}
+                                      onMouseEnter={() => setHoveredVerseId(verseId)}
+                                      onMouseLeave={() => setHoveredVerseId(null)}
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        if (isTestMode) {
+                                          toggleVerseReveal(verseId);
+                                        } else {
+                                          if (selectedVerseId === verseId) {
+                                            setSelectedVerseId(null);
+                                            setHoveredVerseId(null);
+                                          } else {
+                                            setSelectedVerseId(verseId);
+                                          }
+                                        }
+                                      }}
+                                    >
+                                      <span className={`qpc-page-${pageNum}`}>
+                                        {seg.words.map((w, wordIdx) => (
+                                          <span
+                                            key={`${w.id}-${wordIdx}`}
+                                            className="qpc-word"
+                                          >
+                                            {w.text}
+                                            {w.spaceAfter && mushafLayout === "v1" ? "\u200B" : ""}
+                                          </span>
+                                        ))}
+                                      </span>
+                                      {shouldRenderPopup && (
+                                        <VersePopup
+                                          verse={seg.verse}
+                                          verseId={verseId}
+                                          isBookmarked={bookmarkedVerses.has(
+                                            verseId
+                                          )}
+                                          onCopy={copyVerse}
+                                          onBookmark={handleBookmark}
+                                          onShare={shareVerse}
+                                          onTafsir={setActiveTafsirVerse}
+                                          onMutashabihat={
+                                            setActiveMutashabihatVerse
+                                          }
+                                          onPlay={(v) =>
+                                            playVerseAudio(v.chapter, v.verse)
+                                          }
+                                        />
+                                      )}
                                     </span>
-                                    {!isTestMode && (
-                                      <VersePopup
-                                        verse={seg.verse}
-                                        verseId={verseId}
-                                        isBookmarked={bookmarkedVerses.has(
-                                          verseId
-                                        )}
-                                        onCopy={copyVerse}
-                                        onBookmark={handleBookmark}
-                                        onShare={shareVerse}
-                                        onTafsir={setActiveTafsirVerse}
-                                        onMutashabihat={
-                                          setActiveMutashabihatVerse
-                                        }
-                                        onPlay={(v) =>
-                                          playVerseAudio(v.chapter, v.verse)
-                                        }
-                                      />
-                                    )}
-                                  </span>
-                                );
-                              })}
-                            </div>
-                          )}
-                        </Fragment>
-                      );
-                    })
-                  : pages[pageNum].map((verse: any) => {
+                                  );
+                                })}
+                              </div>
+                            )}
+                          </Fragment>
+                        );
+                      })
+                    : pages[pageNum].map((verse: any) => {
                       const verseId = `${verse.chapter}-${verse.verse}`;
                       const isBlurred =
                         isTestMode && !revealedVerses.has(verseId);

@@ -47,14 +47,45 @@ const AudioContext = createContext<AudioContextType | undefined>(undefined);
 
 // ─── Verse timing cache (per reciter + surah) ─────────────────────────────────
 
-const timingCache = new Map<string, VerseTiming[]>();
+interface TimingData {
+  audioUrl?: string;
+  timings: VerseTiming[];
+}
+
+const timingCache = new Map<string, TimingData>();
 
 async function fetchVerseTimings(
   reciterId: number,
   surahNumber: number,
-): Promise<VerseTiming[]> {
+): Promise<TimingData> {
   const cacheKey = `${reciterId}-${surahNumber}`;
   if (timingCache.has(cacheKey)) return timingCache.get(cacheKey)!;
+
+  try {
+    const res = await fetch(
+      `https://api.qurancdn.com/api/qdc/audio/reciters/${reciterId}/audio_files?chapter=${surahNumber}&segments=true`,
+    );
+    if (res.ok) {
+      const json = await res.json();
+      const audioFile = json.audio_files?.[0];
+      const rawTimings = audioFile?.verse_timings || [];
+      if (rawTimings.length > 0) {
+        const timings: VerseTiming[] = rawTimings
+          .filter((f: any) => f && f.verse_key)
+          .map((f: any) => ({
+            verseNumber: parseInt(f.verse_key.split(':')[1], 10),
+            timestampFrom: f.timestamp_from,
+            timestampTo: f.timestamp_to,
+          }));
+        const data: TimingData = {
+          audioUrl: audioFile?.audio_url,
+          timings,
+        };
+        timingCache.set(cacheKey, data);
+        return data;
+      }
+    }
+  } catch {}
 
   try {
     const res = await fetch(
@@ -63,16 +94,25 @@ async function fetchVerseTimings(
     if (!res.ok) throw new Error('Timing fetch failed');
     const json = await res.json();
 
-    const timings: VerseTiming[] = (json.audio_files || []).map((f: any) => ({
-      verseNumber: parseInt(f.verse_key.split(':')[1]),
-      timestampFrom: f.timestamp_from,
-      timestampTo: f.timestamp_to,
-    }));
+    const rawTimings =
+      json.audio_files?.[0]?.timestamps ||
+      json.audio_file?.timestamps ||
+      json.timestamps ||
+      [];
 
-    timingCache.set(cacheKey, timings);
-    return timings;
+    const timings: VerseTiming[] = rawTimings
+      .filter((f: any) => f && f.verse_key)
+      .map((f: any) => ({
+        verseNumber: parseInt(f.verse_key.split(':')[1], 10),
+        timestampFrom: f.timestamp_from,
+        timestampTo: f.timestamp_to,
+      }));
+
+    const data: TimingData = { timings };
+    timingCache.set(cacheKey, data);
+    return data;
   } catch {
-    return []; // Graceful fallback – highlight won't move but audio still plays
+    return { timings: [] };
   }
 }
 
@@ -130,7 +170,7 @@ export function AudioProvider({ children }: { children: ReactNode }) {
     // Find the verse whose window contains the current timestamp
     const active = timings.find(
       t => currentTimeMs >= t.timestampFrom && currentTimeMs < t.timestampTo,
-    ) ?? timings[timings.length - 1];
+    ) ?? (currentTimeMs >= timings[timings.length - 1].timestampFrom ? timings[timings.length - 1] : timings[0]);
 
     if (active && active.verseNumber !== stateRef.current.currentVerse) {
       setState(prev => ({ ...prev, currentVerse: active.verseNumber }));
@@ -192,64 +232,6 @@ export function AudioProvider({ children }: { children: ReactNode }) {
 
   // ── Play actions ──────────────────────────────────────────────────────────
 
-  const playSurah = useCallback(async (surahNumber: number) => {
-    if (!currentReciter || !audioRef.current) return;
-
-    const key = `${currentReciter.id}:surah:${surahNumber}`;
-    currentVersePlayCountRef.current = 1;
-
-    if (preloadedKeyRef.current === key && preloadRef.current && preloadRef.current.src) {
-      // Pause active
-      audioRef.current.pause();
-
-      // Swap
-      const temp = audioRef.current;
-      audioRef.current = preloadRef.current;
-      preloadRef.current = temp;
-
-      preloadedKeyRef.current = null;
-
-      audioRef.current.playbackRate = stateRef.current.playbackRate;
-      safePlay();
-
-      setState(prev => ({
-        ...prev,
-        currentSurah: surahNumber,
-        currentVerse: 1,
-        playbackMode: 'surah',
-        isPlaying: true,
-        currentTime: audioRef.current!.currentTime,
-        duration: audioRef.current!.duration || 0,
-        currentVersePlayCount: 1,
-      }));
-    } else {
-      audioRef.current.pause();
-      const url = getSurahUrl(currentReciter, surahNumber);
-      audioRef.current.src = url;
-      audioRef.current.playbackRate = stateRef.current.playbackRate;
-      safePlay();
-
-      setState(prev => ({
-        ...prev,
-        currentSurah: surahNumber,
-        currentVerse: 1,
-        playbackMode: 'surah',
-        isPlaying: true,
-        currentVersePlayCount: 1,
-      }));
-    }
-
-    // Fetch verse timings in the background (non-blocking)
-    if (currentReciter.quranComId) {
-      verseTimingsRef.current = []; // Clear previous timings
-      const timings = await fetchVerseTimings(currentReciter.quranComId, surahNumber);
-      verseTimingsRef.current = timings;
-    }
-
-    // Preload next surah
-    preloadNextSurah(currentReciter, surahNumber);
-  }, [currentReciter, getSurahUrl, safePlay, preloadNextSurah]);
-
   const playVerse = useCallback((surahNumber: number, verseNumber: number) => {
     if (!currentReciter || !audioRef.current) return;
     verseTimingsRef.current = []; // No timing needed for single-verse mode
@@ -298,6 +280,47 @@ export function AudioProvider({ children }: { children: ReactNode }) {
 
     preloadNextVerse(currentReciter, surahNumber, verseNumber);
   }, [currentReciter, getVerseUrl, safePlay, preloadNextVerse]);
+
+  const playSurah = useCallback(async (surahNumber: number) => {
+    if (!currentReciter || !audioRef.current) return;
+    currentVersePlayCountRef.current = 1;
+
+    audioRef.current.pause();
+    const url = getSurahUrl(currentReciter, surahNumber);
+    audioRef.current.src = url;
+    audioRef.current.playbackRate = stateRef.current.playbackRate;
+    safePlay();
+
+    setState(prev => ({
+      ...prev,
+      currentSurah: surahNumber,
+      currentVerse: 1,
+      playbackMode: 'surah',
+      isPlaying: true,
+      currentVersePlayCount: 1,
+    }));
+
+    // Fetch verse timings for real-time gapless verse highlighting
+    const reciterId = currentReciter.quranComId || currentReciter.id;
+    if (reciterId) {
+      verseTimingsRef.current = [];
+      const data = await fetchVerseTimings(reciterId, surahNumber);
+      verseTimingsRef.current = data.timings;
+
+      if (data.audioUrl && audioRef.current && stateRef.current.currentSurah === surahNumber) {
+        const curTime = audioRef.current.currentTime;
+        const isPlaying = !audioRef.current.paused;
+        audioRef.current.src = data.audioUrl;
+        audioRef.current.currentTime = curTime;
+        audioRef.current.playbackRate = stateRef.current.playbackRate;
+        if (isPlaying) {
+          safePlay();
+        }
+      }
+    }
+
+    preloadNextSurah(currentReciter, surahNumber);
+  }, [currentReciter, getSurahUrl, safePlay, preloadNextSurah]);
 
   const stop = () => {
     if (audio1Ref.current) {

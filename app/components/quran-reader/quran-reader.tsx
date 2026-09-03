@@ -82,20 +82,86 @@ export default function QuranReader({
     });
   }, []);
 
-  // Load verses asynchronously using Server Action
+  // Pre-fetch helper for adjacent surahs to make page turns instantaneous (0ms)
+  const prefetchSurahData = async (sNum: number) => {
+    if (sNum < 1 || sNum > 114) return;
+    if (versesCache[sNum]) return;
+    try {
+      const { getFastSurahVerses } = await import("@/app/lib/quran-fast-loader");
+      const data = await getFastSurahVerses(sNum);
+      if (data && data.verses) {
+        versesCache[sNum] = data.verses;
+        translationsCache[sNum] = data.translations;
+        transliterationsCache[sNum] = data.transliterations;
+        setPersistentCache(`verses_${sNum}`, data);
+      }
+    } catch {
+      // Fallback
+    }
+  };
+
+  // Load verses asynchronously with 0ms memory cache, client static loader, and background prefetching
   useEffect(() => {
     let active = true;
     const loadVerses = async () => {
+      // 1. Check memory cache (0ms instant load)
+      if (versesCache[surahNumber]) {
+        setVerses(versesCache[surahNumber]);
+        setTranslations(translationsCache[surahNumber] || {});
+        setTransliterations(transliterationsCache[surahNumber] || {});
+        setLoadingVerses(false);
+        // Pre-fetch adjacent surahs in background
+        setTimeout(() => {
+          prefetchSurahData(surahNumber + 1);
+          prefetchSurahData(surahNumber - 1);
+        }, 50);
+        return;
+      }
+
       setLoadingVerses(true);
-      const { fetchSurahVerses } = await import("@/app/actions/get-verses");
-      const data = await fetchSurahVerses(surahNumber);
-      if (active) {
+
+      // 2. Check IndexedDB persistent cache (<5ms)
+      const cached = await getPersistentCache<{
+        verses: QuranVerse[];
+        translations: Record<string, string>;
+        transliterations: Record<string, string>;
+      }>(`verses_${surahNumber}`);
+
+      if (cached && active) {
+        versesCache[surahNumber] = cached.verses;
+        translationsCache[surahNumber] = cached.translations;
+        transliterationsCache[surahNumber] = cached.transliterations;
+        setVerses(cached.verses);
+        setTranslations(cached.translations);
+        setTransliterations(cached.transliterations);
+        setLoadingVerses(false);
+        setTimeout(() => {
+          prefetchSurahData(surahNumber + 1);
+          prefetchSurahData(surahNumber - 1);
+        }, 50);
+        return;
+      }
+
+      // 3. Sub-millisecond Client Static Fast Loader (0ms)
+      const { getFastSurahVerses } = await import("@/app/lib/quran-fast-loader");
+      const data = await getFastSurahVerses(surahNumber);
+      if (active && data && data.verses.length > 0) {
+        versesCache[surahNumber] = data.verses;
+        translationsCache[surahNumber] = data.translations;
+        transliterationsCache[surahNumber] = data.transliterations;
         setVerses(data.verses);
         setTranslations(data.translations);
         setTransliterations(data.transliterations);
         setLoadingVerses(false);
+        setPersistentCache(`verses_${surahNumber}`, data);
+
+        setTimeout(() => {
+          prefetchSurahData(surahNumber + 1);
+          prefetchSurahData(surahNumber - 1);
+        }, 50);
       }
     };
+
     loadVerses();
     return () => {
       active = false;

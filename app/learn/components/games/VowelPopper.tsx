@@ -505,9 +505,9 @@ export default function VowelPopper({ styles, onAwardXp, onBackToArcade }: Vowel
   return (
     <div style={{
       width: '100%',
-      minHeight: '680px',
+      minHeight: 'min(650px, 85vh)',
       background: 'linear-gradient(180deg, #0f172a 0%, #1e1b4b 50%, #0284c7 100%)',
-      borderRadius: '28px',
+      borderRadius: '24px',
       boxShadow: '0 20px 50px rgba(0, 0, 0, 0.4)',
       position: 'relative',
       overflow: 'hidden',

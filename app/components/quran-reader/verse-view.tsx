@@ -39,6 +39,22 @@ export default function VerseView({
     Record<string, string[]>
   >({});
   const wordAudioRef = useRef<HTMLAudioElement | null>(null);
+  const [windowWidth, setWindowWidth] = useState<number>(() => {
+    if (typeof window !== "undefined") return window.innerWidth;
+    return 375;
+  });
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setWindowWidth(window.innerWidth);
+      const handleResize = () => setWindowWidth(window.innerWidth);
+      window.addEventListener("resize", handleResize);
+      return () => window.removeEventListener("resize", handleResize);
+    }
+  }, []);
+
+  const isMobile = windowWidth < 768;
+  const effectiveFontSize = isMobile ? Math.min(displayFontSize, 30) : displayFontSize;
 
   useEffect(() => {
     let isMounted = true;
@@ -119,13 +135,13 @@ export default function VerseView({
               <div
                 className={styles.hafsVerseMarker}
                 style={{
-                  position: "absolute",
+                  position: isMobile ? "static" : "absolute",
                   top: "24px",
                   left: "24px",
-                  margin: 0,
-                  fontSize: "1rem",
-                  width: "40px",
-                  height: "40px",
+                  margin: isMobile ? "0 0 10px 0" : "0",
+                  fontSize: isMobile ? "0.85rem" : "1rem",
+                  width: isMobile ? "32px" : "40px",
+                  height: isMobile ? "32px" : "40px",
                 }}
               >
                 {verse.verse}
@@ -159,8 +175,8 @@ export default function VerseView({
                         : "arabic-text"
                     }
                     style={{
-                      fontSize: `${displayFontSize}px`,
-                      lineHeight: "2.3",
+                      fontSize: `${effectiveFontSize}px`,
+                      lineHeight: "1.6",
                       marginBottom: "0",
                       textAlign: "right",
                       direction: "rtl",

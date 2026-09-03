@@ -373,9 +373,9 @@ export default function SoundDetective({ styles, onAwardXp, onBackToArcade }: So
   return (
     <div style={{
       width: '100%',
-      minHeight: '680px',
+      minHeight: 'min(650px, 85vh)',
       background: 'linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #4c1d95 100%)',
-      borderRadius: '28px',
+      borderRadius: '24px',
       boxShadow: '0 20px 50px rgba(0, 0, 0, 0.4)',
       position: 'relative',
       overflow: 'hidden',
@@ -388,14 +388,16 @@ export default function SoundDetective({ styles, onAwardXp, onBackToArcade }: So
 
       {/* --- TOP CONTROL BAR --- */}
       <div style={{
-        padding: '16px 24px',
+        padding: '12px 16px',
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
         background: 'rgba(15, 23, 42, 0.65)',
         backdropFilter: 'blur(12px)',
         borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
-        zIndex: 20
+        zIndex: 20,
+        flexWrap: 'wrap',
+        gap: '8px'
       }}>
         <button
           onClick={onBackToArcade}
@@ -403,19 +405,20 @@ export default function SoundDetective({ styles, onAwardXp, onBackToArcade }: So
             background: 'rgba(255, 255, 255, 0.12)',
             border: '1px solid rgba(255, 255, 255, 0.2)',
             color: '#ffffff',
-            padding: '8px 16px',
+            padding: '6px 14px',
             borderRadius: '50px',
             fontWeight: 700,
             cursor: 'pointer',
             display: 'flex',
             alignItems: 'center',
-            gap: '8px'
+            gap: '6px',
+            fontSize: '0.85rem'
           }}
         >
           <ArrowLeft size={16} /> Arcade
         </button>
 
-        <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
+        <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
           {LEVEL_META.map((lvl, idx) => (
             <button
               key={lvl.id}
@@ -424,10 +427,10 @@ export default function SoundDetective({ styles, onAwardXp, onBackToArcade }: So
                 background: currentLevelIdx === idx ? 'linear-gradient(135deg, #a78bfa 0%, #7c3aed 100%)' : 'rgba(255, 255, 255, 0.1)',
                 color: '#ffffff',
                 border: `1px solid ${currentLevelIdx === idx ? '#a78bfa' : 'rgba(255, 255, 255, 0.15)'}`,
-                padding: '6px 12px',
+                padding: '4px 10px',
                 borderRadius: '50px',
                 fontWeight: 800,
-                fontSize: '0.78rem',
+                fontSize: '0.75rem',
                 cursor: 'pointer'
               }}
             >
@@ -447,24 +450,24 @@ export default function SoundDetective({ styles, onAwardXp, onBackToArcade }: So
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          padding: '24px',
+          padding: '16px',
           zIndex: 50
         }}>
           <div style={{
             background: 'linear-gradient(135deg, #1e293b 0%, #0f172a 100%)',
             border: '2px solid rgba(167, 139, 250, 0.3)',
-            borderRadius: '28px',
-            padding: '32px',
+            borderRadius: '24px',
+            padding: '24px 16px',
             maxWidth: '520px',
             width: '100%',
             textAlign: 'center',
             boxShadow: '0 20px 40px rgba(0,0,0,0.5)'
           }}>
-            <div style={{ fontSize: '3.8rem', marginBottom: '12px' }}>🎧</div>
-            <h2 style={{ fontSize: '1.8rem', fontWeight: 900, color: '#ffffff', marginBottom: '8px' }}>
+            <div style={{ fontSize: '3rem', marginBottom: '8px' }}>🎧</div>
+            <h2 style={{ fontSize: '1.5rem', fontWeight: 900, color: '#ffffff', marginBottom: '8px' }}>
               Sound Detective
             </h2>
-            <p style={{ color: '#94a3b8', fontSize: '0.92rem', marginBottom: '24px', lineHeight: 1.6 }}>
+            <p style={{ color: '#94a3b8', fontSize: '0.85rem', marginBottom: '20px', lineHeight: 1.5 }}>
               Test your ear! Listen to authentic native Arabic speech MP3 audio clips for Short Vowels, Tanween, Sukoon, Shaddah & Makhraj!
             </p>
 
@@ -475,10 +478,10 @@ export default function SoundDetective({ styles, onAwardXp, onBackToArcade }: So
                 background: 'linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%)',
                 border: 'none',
                 color: '#ffffff',
-                padding: '14px',
+                padding: '12px',
                 borderRadius: '18px',
                 fontWeight: 900,
-                fontSize: '1.1rem',
+                fontSize: '1rem',
                 cursor: 'pointer',
                 boxShadow: '0 6px 20px rgba(139, 92, 246, 0.4)',
                 display: 'flex',
@@ -487,7 +490,7 @@ export default function SoundDetective({ styles, onAwardXp, onBackToArcade }: So
                 gap: '8px'
               }}
             >
-              <Sparkles size={20} /> Start Detective Mission 🔍
+              <Sparkles size={18} /> Start Detective Mission 🔍
             </button>
           </div>
         </div>
@@ -500,7 +503,7 @@ export default function SoundDetective({ styles, onAwardXp, onBackToArcade }: So
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'space-between',
-          padding: '24px',
+          padding: '16px 12px',
           zIndex: 10
         }}>
           {/* Stats Bar */}
@@ -510,19 +513,21 @@ export default function SoundDetective({ styles, onAwardXp, onBackToArcade }: So
             alignItems: 'center',
             background: 'rgba(255, 255, 255, 0.08)',
             backdropFilter: 'blur(12px)',
-            padding: '10px 20px',
-            borderRadius: '18px',
-            border: '1px solid rgba(255, 255, 255, 0.12)'
+            padding: '8px 14px',
+            borderRadius: '16px',
+            border: '1px solid rgba(255, 255, 255, 0.12)',
+            flexWrap: 'wrap',
+            gap: '6px'
           }}>
             <div>
-              <span style={{ fontWeight: 800, color: '#c4b5fd', fontSize: '0.9rem' }}>
+              <span style={{ fontWeight: 800, color: '#c4b5fd', fontSize: '0.85rem' }}>
                 Question {questionIdx + 1} / {questions.length}
               </span>
-              <span style={{ fontSize: '0.75rem', color: '#94a3b8', marginLeft: '12px', fontWeight: 700 }}>
+              <span style={{ fontSize: '0.75rem', color: '#94a3b8', marginLeft: '8px', fontWeight: 700 }}>
                 {levelMeta.name}
               </span>
             </div>
-            <div style={{ display: 'flex', gap: '16px', fontWeight: 800, fontSize: '0.9rem' }}>
+            <div style={{ display: 'flex', gap: '12px', fontWeight: 800, fontSize: '0.85rem' }}>
               {streak > 1 && <span style={{ color: '#f59e0b' }}>🔥 Streak x{streak}</span>}
               <span style={{ color: '#a78bfa' }}>⭐ Score: {score}</span>
             </div>
@@ -535,10 +540,10 @@ export default function SoundDetective({ styles, onAwardXp, onBackToArcade }: So
               : 'rgba(255, 255, 255, 0.06)',
             backdropFilter: 'blur(16px)',
             border: `2px ${isPlayingAudio ? 'solid #a78bfa' : 'dashed rgba(255, 255, 255, 0.2)'}`,
-            borderRadius: '24px',
-            padding: '32px 20px',
+            borderRadius: '20px',
+            padding: '20px 14px',
             textAlign: 'center',
-            margin: '20px 0',
+            margin: '12px 0',
             boxShadow: isPlayingAudio ? '0 0 30px rgba(167, 139, 250, 0.4)' : '0 10px 30px rgba(0,0,0,0.2)',
             transition: 'all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)'
           }}>
@@ -548,26 +553,26 @@ export default function SoundDetective({ styles, onAwardXp, onBackToArcade }: So
                 background: 'linear-gradient(135deg, #a78bfa 0%, #7c3aed 100%)',
                 color: '#ffffff',
                 border: 'none',
-                width: '110px',
-                height: '110px',
+                width: 'clamp(75px, 15vw, 100px)',
+                height: 'clamp(75px, 15vw, 100px)',
                 borderRadius: '50%',
                 cursor: 'pointer',
                 boxShadow: '0 10px 30px rgba(124, 58, 237, 0.5)',
-                marginBottom: '16px',
+                marginBottom: '12px',
                 display: 'inline-flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                transform: isPlayingAudio ? 'scale(1.12)' : 'scale(1)',
+                transform: isPlayingAudio ? 'scale(1.1)' : 'scale(1)',
                 transition: 'all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275)'
               }}
             >
-              <Volume2 size={48} />
+              <Volume2 size={36} />
             </button>
 
-            <h3 style={{ fontSize: '1.4rem', fontWeight: 900, color: '#ffffff', margin: '0 0 6px 0' }}>
+            <h3 style={{ fontSize: '1.1rem', fontWeight: 900, color: '#ffffff', margin: '0 0 4px 0' }}>
               {isPlayingAudio ? '🔊 Playing Arabic Sound...' : '▶️ Tap Button to Hear Sound'}
             </h3>
-            <p style={{ fontSize: '0.9rem', color: '#c4b5fd', fontWeight: 700, margin: 0 }}>
+            <p style={{ fontSize: '0.85rem', color: '#c4b5fd', fontWeight: 700, margin: 0 }}>
               Clue: <span style={{ color: '#fef08a' }}>{question.hint}</span>
             </p>
           </div>
@@ -576,8 +581,8 @@ export default function SoundDetective({ styles, onAwardXp, onBackToArcade }: So
           <div style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(2, 1fr)',
-            gap: '14px',
-            marginBottom: '16px'
+            gap: '10px',
+            marginBottom: '12px'
           }}>
             {question.options.map((option) => {
               const isSelected = selectedOption === option;
@@ -605,10 +610,10 @@ export default function SoundDetective({ styles, onAwardXp, onBackToArcade }: So
                   style={{
                     background: btnBg,
                     border: btnBorder,
-                    borderRadius: '20px',
-                    padding: '20px',
-                    fontSize: '3rem',
-                    fontFamily: 'var(--font-arabic-alt), var(--font-qpc), serif',
+                    borderRadius: '16px',
+                    padding: '12px 8px',
+                    fontSize: 'clamp(1.5rem, 6vw, 2.5rem)',
+                    fontFamily: "'Tufuli Arabic', var(--font-tufuli), var(--font-arabic), serif",
                     fontWeight: 900,
                     color: textColor,
                     cursor: isAnswered ? 'default' : 'pointer',
@@ -631,10 +636,10 @@ export default function SoundDetective({ styles, onAwardXp, onBackToArcade }: So
                   background: 'linear-gradient(135deg, #a78bfa 0%, #7c3aed 100%)',
                   color: '#ffffff',
                   border: 'none',
-                  padding: '14px 40px',
+                  padding: '12px 32px',
                   borderRadius: '50px',
                   fontWeight: 900,
-                  fontSize: '1.05rem',
+                  fontSize: '0.95rem',
                   cursor: 'pointer',
                   boxShadow: '0 8px 24px rgba(124, 58, 237, 0.4)'
                 }}
