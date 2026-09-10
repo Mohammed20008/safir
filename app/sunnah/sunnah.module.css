@@ -431,16 +431,64 @@
 }
 
 @media (max-width: 640px) {
+  .sunnahContainer {
+    padding: 1rem 0.75rem;
+  }
+
   .header {
     position: relative;
+    padding: 0.75rem !important;
   }
 
   .searchContainer {
     width: 100%;
-    margin-top: 1rem;
+    margin-top: 0.85rem;
   }
 
   .searchInput {
     width: 100%;
+  }
+
+  .categoryTabs {
+    gap: 0.4rem;
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    padding-bottom: 0.85rem;
+    scrollbar-width: none;
+  }
+
+  .categoryTabs::-webkit-scrollbar {
+    display: none;
+  }
+
+  .categoryTab {
+    white-space: nowrap;
+    padding: 0.5rem 1rem;
+    font-size: 0.8rem;
+  }
+
+  .collectionCard {
+    padding: 1.25rem;
+    border-radius: 1.25rem;
+  }
+
+  .collectionFooter {
+    opacity: 1;
+    transform: translateY(0);
+    padding-top: 0.75rem;
+  }
+}
+
+@media (max-width: 380px) {
+  .sunnahContainer {
+    padding: 0.75rem 0.5rem;
+  }
+
+  .collectionTitle {
+    font-size: 1.15rem;
+  }
+
+  .collectionArabic {
+    font-size: 1rem;
   }
 }

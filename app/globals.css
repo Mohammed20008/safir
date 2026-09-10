@@ -405,4 +405,32 @@ main {
 @keyframes floatCloud {
   0% { transform: translateY(0px); }
   100% { transform: translateY(-8px); }
+}
+
+/* Zen Mode / Distraction-Free Reading Mode (Hide sidebar, audio player, floating controls, upper menu & play icons on page tap) */
+html[data-zen-mode="true"] body [class*="primarySidebar"],
+html[data-zen-mode="true"] body [class*="secondarySidebar"],
+html[data-zen-mode="true"] body [class*="playerBar"],
+html[data-zen-mode="true"] body [class*="mobileTriggerBar"],
+html[data-zen-mode="true"] body [class*="mobileHamburgerBtn"],
+html[data-zen-mode="true"] body [class*="mobileQuickActions"],
+html[data-zen-mode="true"] body [class*="mobileQuickPlayBtn"],
+html[data-zen-mode="true"] body [class*="font-toggle"],
+html[data-zen-mode="true"] body nav:not([class*="pageHeader"]),
+html[data-zen-mode="true"] body header:not([class*="pageHeader"]) {
+  opacity: 0 !important;
+  pointer-events: none !important;
+  transition: opacity 0.35s cubic-bezier(0.4, 0, 0.2, 1), transform 0.35s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+html[data-zen-mode="true"] body [class*="primarySidebar"] {
+  transform: translateX(-100%) !important;
+}
+
+html[data-zen-mode="true"] body [class*="mobileTriggerBar"] {
+  transform: translateY(-80px) !important;
+}
+
+html[data-zen-mode="true"] body [class*="playerBar"] {
+  transform: translate(-50%, 120px) !important;
 }

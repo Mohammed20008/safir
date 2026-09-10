@@ -19,20 +19,16 @@ const Navbar = () => {
       <div className={styles.navContent}>
         <Link href="/" className={styles.logo}>
           <div className={styles.logoIcon}>
-            <svg
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-            >
-              <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
-              <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
-            </svg>
+            <Image
+              src="/app_logo.jpg"
+              alt="Safir Qur'an"
+              width={32}
+              height={32}
+              style={{ borderRadius: '8px', objectFit: 'cover' }}
+            />
           </div>
           <div className={styles.logoText}>
-            <span className={styles.brandName}>QuranMaster</span>
+            <span className={styles.brandName}>Safir Qur'an</span>
             <span className={styles.brandBadge}>Premium</span>
           </div>
         </Link>
@@ -471,7 +467,7 @@ const LearningPlatform = () => {
               </div>
             </div>
 
-            <Link href="/learn" className={styles.cardCta}>
+            <Link href="/learn/teachers" className={styles.cardCta}>
               <span>Explore Teachers</span>
               <svg
                 width="20"
@@ -723,6 +719,125 @@ const Features = () => {
   );
 };
 
+const OurApps = () => {
+  return (
+    <section className={styles.ourAppsSection}>
+      <div className={styles.ourAppsContainer}>
+        <div className={styles.ourAppsHeader}>
+          <div className={styles.ourAppsBadge}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <rect x="5" y="2" width="14" height="20" rx="3" ry="3"></rect>
+              <line x1="12" y1="18" x2="12.01" y2="18"></line>
+            </svg>
+            Mobile &amp; Ecosystem
+          </div>
+          <h2 className={styles.ourAppsTitle}>Our Apps</h2>
+          <p className={styles.ourAppsSubtitle}>
+            Experience Safir Qur&apos;an anytime, anywhere. Take the divine word, audio recitations, and interactive Tajweed learning with you on all your devices.
+          </p>
+        </div>
+
+        <div className={styles.ourAppsGrid}>
+          {/* Main Mobile App Card */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className={styles.mainAppCard}
+          >
+            <div>
+              <div className={styles.mainAppHeader}>
+                <div className={styles.mainAppIcon}>
+                  <Image
+                    src="/app_logo.jpg"
+                    alt="Safir Qur'an Mobile App"
+                    width={72}
+                    height={72}
+                    style={{ objectFit: 'cover' }}
+                  />
+                </div>
+                <div className={styles.mainAppTitleGroup}>
+                  <h3 className={styles.mainAppName}>Safir Qur&apos;an Mobile App</h3>
+                  <span className={styles.mainAppTagline}>Available for iOS &amp; Android</span>
+                </div>
+              </div>
+
+              <p className={styles.mainAppDesc}>
+                Full-featured Quranic reading and listening experience designed for smartphones and tablets. Seamless offline access, sync across devices, and crystalline audio recitations.
+              </p>
+
+              <div className={styles.appFeaturesList}>
+                <div className={styles.appFeatureItem}>
+                  <span className={styles.appFeatureIcon}>📖</span>
+                  <span>Interactive Mushaf Reader</span>
+                </div>
+                <div className={styles.appFeatureItem}>
+                  <span className={styles.appFeatureIcon}>🎧</span>
+                  <span>30+ Top Reciters &amp; Audio Sync</span>
+                </div>
+
+
+              </div>
+            </div>
+
+            <div className={styles.downloadButtonsGroup}>
+              <a
+                href="/downloads/Safir.apk"
+                download="Safir.apk"
+                className={`${styles.appStoreBtn} ${styles.apkDownloadBtn}`}
+                title="Download Safir Qur'an Android APK"
+              >
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M17.523 15.3414c-.5511 0-.9993-.4486-.9993-.9997 0-.551.4482-.9993.9993-.9993.5511 0 .9993.4483.9993.9993 0 .5511-.4482.9997-.9993.9997zm-11.046 0c-.5511 0-.9993-.4486-.9993-.9997 0-.551.4482-.9993.9993-.9993.5511 0 .9993.4483.9993.9993 0 .5511-.4482.9997-.9993.9997zm11.4045-6.02l1.9973-3.4592a.416.416 0 00-.1523-.5676.416.416 0 00-.5676.1523l-2.0223 3.503c-1.4638-.6692-3.1364-1.046-4.9126-1.046s-3.4488.3768-4.9126 1.046l-2.0223-3.503a.416.416 0 00-.5676-.1523.416.416 0 00-.1523.5676l1.9973 3.4592c-3.134 1.7064-5.2678 4.8872-5.5404 8.6186h21.9056c-.2726-3.7314-2.4064-6.9122-5.5404-8.6186z" />
+                </svg>
+                <div className={styles.appStoreText}>
+                  <span className={styles.appStoreSub}>Download Direct</span>
+                  <span className={styles.appStoreMain}>Android APK</span>
+                </div>
+              </a>
+
+              <a href="#" className={styles.appStoreBtn}>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 6.33c.64-.78 1.08-1.85.96-2.93-.93.04-2.06.62-2.73 1.4-.59.69-1.11 1.79-.97 2.85 1.05.08 2.11-.54 2.74-1.32z" />
+                </svg>
+                <div className={styles.appStoreText}>
+                  <span className={styles.appStoreSub}>Download on the</span>
+                  <span className={styles.appStoreMain}>App Store</span>
+                </div>
+              </a>
+            </div>
+          </motion.div>
+
+          {/* Web App / Progressive Web App Card */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.15 }}
+            className={styles.secondaryAppCard}
+          >
+            <div>
+              <div className={styles.webPwaBadge}>
+                ⚡ Progressive Web App (PWA)
+              </div>
+              <h3>Safir Qur&apos;an Web &amp; Desktop</h3>
+              <p>
+                Install Safir Qur&apos;an directly on your Mac, Windows, or Linux desktop in seconds without downloading from an app store. Instant desktop experience with offline support.
+              </p>
+            </div>
+
+            <div style={{ marginTop: '2rem' }}>
+              <Link href="/quran" className={styles.primaryBtn} style={{ display: 'inline-flex', width: '100%', justifyContent: 'center' }}>
+                Open Web Application
+              </Link>
+            </div>
+          </motion.div>
+        </div>
+      </div>
+    </section>
+  );
+};
+
 export default function LandingPage() {
   return (
     <div className={styles.container}>
@@ -734,6 +849,7 @@ export default function LandingPage() {
         <Features />
         <LearningPlatform />
         <Articles />
+        <OurApps />
       </main>
 
       <footer className={styles.footer}>
@@ -741,20 +857,16 @@ export default function LandingPage() {
           <div className={styles.footerBrand}>
             <div className={styles.logo}>
               <div className={styles.logoIcon}>
-                <svg
-                  width="18"
-                  height="18"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                >
-                  <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
-                  <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
-                </svg>
+                <Image
+                  src="/app_logo.jpg"
+                  alt="Safir Qur'an"
+                  width={24}
+                  height={24}
+                  style={{ borderRadius: '6px', objectFit: 'cover' }}
+                />
               </div>
               <div className={styles.logoText}>
-                <span className={styles.brandName}>QuranMaster</span>
+                <span className={styles.brandName}>Safir Qur'an</span>
               </div>
             </div>
             <p>
@@ -782,7 +894,7 @@ export default function LandingPage() {
           </div>
         </div>
         <div className={styles.footerBottom}>
-          <p>© 2025 QuranMaster. All rights reserved.</p>
+          <p>© 2025 Safir Qur'an. All rights reserved.</p>
           <p>Made with ❤️ for the Ummah</p>
         </div>
       </footer>

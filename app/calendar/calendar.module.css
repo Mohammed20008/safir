@@ -324,8 +324,10 @@
 
 @media (max-width: 1200px) {
   .main {
-    flex-direction: column;
+    grid-template-columns: 1fr;
     max-width: 1000px;
+    padding: 2rem 1.25rem;
+    gap: 2rem;
   }
   
   .sidebar {
@@ -335,17 +337,85 @@
 }
 
 @media (max-width: 640px) {
-  .calendarSection {
-    padding: 1.5rem;
-    border-radius: 16px;
+  .header {
+    padding: 2.5rem 1rem 1.5rem 1rem;
   }
-  
-  .dayCell {
-    padding: 0.5rem;
+
+  .headerContent {
+    gap: 1rem;
+  }
+
+  .headerContent h1 {
+    font-size: 1.75rem;
+  }
+
+  .headerContent p {
+    font-size: 0.88rem;
+  }
+
+  .backBtn {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+  }
+
+  .main {
+    padding: 1.25rem 0.75rem;
+  }
+
+  .pickerSide {
+    padding: 1.5rem 1rem;
+    border-radius: 18px;
+  }
+
+  .pickerMonth {
+    font-size: 1.6rem !important;
+  }
+
+  .calendarWrapper {
+    gap: 0.25rem;
+    margin: 0.75rem 0;
+  }
+
+  .sideArrow {
+    width: 30px;
+    height: 30px;
+  }
+
+  .dayBtn {
+    padding: 4px;
     border-radius: 10px;
   }
-  
+
   .dayNumber {
-    font-size: 1rem;
+    font-size: 0.95rem;
+  }
+
+  .sideCard {
+    padding: 1.25rem;
+    border-radius: 16px;
+  }
+
+  .sideCard h3 {
+    font-size: 1.25rem;
+    margin-bottom: 1rem;
+  }
+}
+
+@media (max-width: 380px) {
+  .headerContent h1 {
+    font-size: 1.45rem;
+  }
+
+  .pickerSide {
+    padding: 1rem 0.5rem;
+  }
+
+  .dayBtn {
+    padding: 2px;
+  }
+
+  .dayNumber {
+    font-size: 0.85rem;
   }
 }

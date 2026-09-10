@@ -433,9 +433,16 @@ export default function QuranReader({
         }
       });
 
-      const surahsToLoad = Array.from(surahsOnThesePages).filter(
-        (n) => n >= 1 && n <= 114
-      );
+      const surahsToLoad = Array.from(
+        new Set([
+          ...Array.from(surahsOnThesePages),
+          Math.max(1, surahNumber - 2),
+          Math.max(1, surahNumber - 1),
+          surahNumber,
+          Math.min(114, surahNumber + 1),
+          Math.min(114, surahNumber + 2),
+        ])
+      ).filter((n) => n >= 1 && n <= 114);
 
       const layout = settings.mushafLayout;
 

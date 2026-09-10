@@ -439,7 +439,7 @@
 
 @media (max-width: 768px) {
   .navContent {
-    padding: 0 16px;
+    padding: 0 12px;
   }
   .bookTitle {
     font-size: 1.1rem;
@@ -454,17 +454,46 @@
   .currentChapter {
     display: none;
   }
+  .dropdownMenu {
+    width: calc(100vw - 32px);
+    right: -10px;
+    max-height: 350px;
+  }
   .mainContent {
-    padding: 20px 16px;
+    padding: 16px 12px;
   }
   .chapterHeader {
-    padding: 24px;
+    padding: 20px 16px;
+    border-radius: 16px;
+  }
+  .chapterTitle {
+    font-size: 1.6rem;
   }
   .hadithCard {
-    padding: 20px;
+    padding: 16px;
+    border-radius: 16px;
   }
   .arabicText {
-    font-size: 1.4rem;
+    font-size: clamp(1.25rem, 5vw, 1.6rem);
+    line-height: 2;
+  }
+  .englishText {
+    font-size: 0.98rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .navLeft, .navRight {
+    gap: 8px;
+  }
+  .hadithMeta {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  .hadithActions {
+    width: 100%;
+    justify-content: flex-end;
   }
 }
 

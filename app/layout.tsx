@@ -53,9 +53,14 @@ import ChatModal from "./components/chat/chat-modal";
 import { Toaster } from "sonner";
 
 export const metadata: Metadata = {
-  title: "Al-Quran - القرآن الكريم",
+  title: "Safir Qur'an - القرآن الكريم",
   description:
-    "Read and explore the Holy Quran with translations and transliterations",
+    "Read and explore the Holy Quran with translations and transliterations on Safir Qur'an",
+  icons: {
+    icon: "/app_logo.jpg",
+    shortcut: "/app_logo.jpg",
+    apple: "/app_logo.jpg",
+  },
 };
 
 export default function RootLayout({
@@ -66,6 +71,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
+        <link rel="icon" href="/app_logo.jpg" />
         <link rel="preload" href="/new_header.png" as="image" />
         <link
           rel="preload"

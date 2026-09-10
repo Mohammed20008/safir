@@ -112,6 +112,45 @@ export default function PageView({
     }
   }, []);
 
+  const handleVerseMouseEnter = (verseId: string) => {
+    if (typeof document !== "undefined") {
+      const els = document.querySelectorAll(`[data-verse-id="${verseId}"]`);
+      els.forEach((el) => el.classList.add(styles.verseHovered));
+    }
+  };
+
+  const handleVerseMouseLeave = (verseId: string) => {
+    if (typeof document !== "undefined") {
+      const els = document.querySelectorAll(`[data-verse-id="${verseId}"]`);
+      els.forEach((el) => {
+        if (el.getAttribute("data-selected") !== "true") {
+          el.classList.remove(styles.verseHovered);
+        }
+      });
+    }
+  };
+
+  const handlePageContainerClick = (e: React.MouseEvent) => {
+    const target = e.target as HTMLElement;
+    if (
+      target &&
+      (target.closest("[data-verse-id]") ||
+        target.closest(`.${styles.versePopup}`) ||
+        target.closest("button") ||
+        target.closest("a"))
+    ) {
+      return;
+    }
+    if (typeof document !== "undefined") {
+      const isZen = document.documentElement.getAttribute("data-zen-mode") === "true";
+      if (isZen) {
+        document.documentElement.removeAttribute("data-zen-mode");
+      } else {
+        document.documentElement.setAttribute("data-zen-mode", "true");
+      }
+    }
+  };
+
   const isMobile = windowSize.width < 768;
 
   // Standard Madani Mushaf page dimensions for single page mode
@@ -126,39 +165,40 @@ export default function PageView({
 
   // Maximum allowed width fitting viewport on mobile
   const maxAllowedWidth = isMobile
-    ? windowSize.width - 4
+    ? windowSize.width
     : Math.max(300, Math.min(windowSize.width - 32, 920));
 
   // Desired page width based on requested font size
   const desiredPageWidth = basePageZoom * BASE_PAGE_WIDTH;
 
-  // Page width maximized to fit within 2px side margins on mobile
-  const actualPageWidth = isMobile ? windowSize.width - 4 : Math.min(desiredPageWidth, maxAllowedWidth);
+  // Page width maximized to fit full view on mobile
+  const actualPageWidth = isMobile ? windowSize.width : Math.min(desiredPageWidth, maxAllowedWidth);
 
   // Scaled font size strictly proportional to actual page width with mobile boost
   const finalFontSize = isMobile
-    ? Math.max((actualPageWidth / BASE_PAGE_WIDTH) * BASE_PAGE_FONT_SIZE, 18.5)
+    ? Math.max((actualPageWidth / BASE_PAGE_WIDTH) * BASE_PAGE_FONT_SIZE, 19.5)
     : (actualPageWidth / BASE_PAGE_WIDTH) * BASE_PAGE_FONT_SIZE;
-  // Memoize page bucketing and active page list sorting
+  // Memoize page bucketing and active page list sorting for continuous Quran swiping
   const { sortedActivePages, pages } = useMemo(() => {
-    // Collect all pages for this surah
-    const currentSurahPages = new Set<number>();
-    verses.forEach((v: any) => {
-      const vQpc = qpcData[`${surahNumber}-${v.verse}`];
-      if (vQpc?.words && vQpc.words.length > 0) {
-        vQpc.words.forEach((w: any) => {
-          if (w.page) currentSurahPages.add(w.page);
-        });
-      } else if (vQpc?.page) {
-        currentSurahPages.add(vQpc.page);
-      }
+    const pageSet = new Set<number>();
+
+    // Add pages from qpcData
+    Object.values(qpcData).forEach((v) => {
+      if (v.page) pageSet.add(v.page);
     });
 
-    const startPage = pageMapping?.[`${surahNumber}:1`] || 1;
-    const activePagesList =
-      currentSurahPages.size > 0
-        ? Array.from(currentSurahPages).sort((a, b) => a - b)
-        : [startPage];
+    // Add starting pages from pageMapping for all surahs
+    Object.values(pageMapping || {}).forEach((p) => {
+      if (p) pageSet.add(p);
+    });
+
+    // Expand page window around current surah start page for continuous swiping
+    const startP = pageMapping?.[`${surahNumber}:1`] || 1;
+    for (let p = Math.max(1, startP - 15); p <= Math.min(604, startP + 25); p++) {
+      pageSet.add(p);
+    }
+
+    const activePagesList = Array.from(pageSet).sort((a, b) => a - b);
 
     // Bucket verses per page: a verse belongs to pageNum if ANY of its words belong to pageNum
     const versesByPage: Record<number, any[]> = {};
@@ -190,9 +230,29 @@ export default function PageView({
     return { sortedActivePages: activePagesList, pages: pagesRecord };
   }, [verses, qpcData, surahNumber, pageMapping, allVerses]);
 
+  // Smooth scroll container to active surah start page when surah selection changes
+  useEffect(() => {
+    const startP = pageMapping?.[`${surahNumber}:1`];
+    if (startP) {
+      const timer = setTimeout(() => {
+        const el = document.getElementById(`mushaf-page-${startP}`);
+        if (el) {
+          el.scrollIntoView({ behavior: "smooth", block: "start", inline: "start" });
+        }
+      }, 50);
+      return () => clearTimeout(timer);
+    }
+  }, [surahNumber, pageMapping]);
+
+const toArabicNumerals = (num: number | string): string => {
+  if (num === undefined || num === null || num === "") return "";
+  return String(num).replace(/\d/g, (d) => "٠١٢٣٤٥٦٧٨٩"[parseInt(d, 10)]);
+};
+
   const getPageInfo = (pNum: number) => {
     const pVerses = pages[pNum];
-    if (!pVerses || pVerses.length === 0) return { sName: "", jNum: "" };
+    if (!pVerses || pVerses.length === 0)
+      return { sName: "", jNum: "", pageNumArabic: toArabicNumerals(pNum) };
     const firstV = pVerses[0];
     const sInfo = surahs.find((s) => s.number === firstV.chapter);
     let jNum = "";
@@ -208,7 +268,20 @@ export default function PageView({
       });
       if (found) jNum = (found as any).juz_number;
     }
-    return { sName: sInfo ? `Surat ${sInfo.transliteration}` : "", jNum };
+
+    const surahNameArabic = sInfo
+      ? sInfo.name.startsWith("سورة")
+        ? sInfo.name
+        : `سورة ${sInfo.name}`
+      : "";
+
+    const juzTextArabic = jNum ? `الجزء ${toArabicNumerals(jNum)}` : "";
+
+    return {
+      sName: surahNameArabic,
+      jNum: juzTextArabic,
+      pageNumArabic: toArabicNumerals(pNum),
+    };
   };
 
   const isQpcReady =
@@ -319,8 +392,8 @@ export default function PageView({
           }}
         >
           <div className={styles.pageHeader}>
-            <span>{info.sName}</span>
-            <span>Juz&apos; {info.jNum}</span>
+            <span className={styles.pageHeaderJuz}>{info.jNum}</span>
+            <span className={styles.pageHeaderSurah}>{info.sName}</span>
           </div>
           <div className={styles.spineShadowOverlay} />
           <div
@@ -335,7 +408,7 @@ export default function PageView({
             ))}
           </div>
           <div className={styles.pageFooter}>
-            <span>{pageNum}</span>
+            <span>{info.pageNumArabic || pageNum}</span>
           </div>
         </div>
       </div>
@@ -360,13 +433,20 @@ export default function PageView({
         );
 
         const isEven = pageNum % 2 === 0;
+        const rightStackRatio = pageNum / 604;
+        const leftStackRatio = (604 - pageNum) / 604;
+        const rightStackWidth = Math.max(2, Math.round(rightStackRatio * 14));
+        const leftStackWidth = Math.max(2, Math.round(leftStackRatio * 14));
 
         return (
           <div
             key={pageNum}
+            id={`mushaf-page-${pageNum}`}
             className={`${styles.realisticPageWrapper} ${isEven ? styles.evenPage : styles.oddPage}`}
             style={{
               "--page-width": `${actualPageWidth}px`,
+              "--right-stack-width": `${rightStackWidth}px`,
+              "--left-stack-width": `${leftStackWidth}px`,
               width: `${actualPageWidth}px`,
               maxWidth: "100%",
             } as React.CSSProperties}
@@ -376,13 +456,14 @@ export default function PageView({
             <div className={styles.paperLayer1} />
             <div
               className={`${styles.mushafPage} ${pageNum <= 2 ? styles.mushafPageFirst : ""} ${mushafLayout === "v1" ? styles.v1Book : ""}`}
+              onClick={handlePageContainerClick}
               style={{
                 marginBottom: "0px",
               }}
             >
               <div className={styles.pageHeader}>
-                <span>{info.sName}</span>
-                <span>Juz&apos; {info.jNum}</span>
+                <span className={styles.pageHeaderJuz}>{info.jNum}</span>
+                <span className={styles.pageHeaderSurah}>{info.sName}</span>
               </div>
               <div className={styles.spineShadowOverlay} />
               <div
@@ -422,18 +503,19 @@ export default function PageView({
                                     audioCurrentSurah === seg.words[0].surahNum &&
                                     audioCurrentVerse === seg.words[0].verseNum;
                                   const isPaused = isPlaying && !audioIsPlaying;
-                                  const isHighlighted = selectedVerseId === verseId;
+                                  const isSelected = selectedVerseId === verseId;
                                   const isFirstSegmentOfVerse = seg.words[0]?.word === 1;
-                                  const shouldRenderPopup = !isTestMode && selectedVerseId === verseId && isFirstSegmentOfVerse;
+                                  const shouldRenderPopup = !isTestMode && isSelected && isFirstSegmentOfVerse;
 
                                   return (
                                     <span
                                       key={`${verseId}-${sIdx}`}
                                       id={`verse-${verseId}`}
                                       data-verse-id={verseId}
-                                      className={`${styles.pageVerse} ${isBlurred ? styles.blurred : styles.revealed} ${isPlaying ? styles.playing : ""} ${isPaused ? styles.paused : ""} ${isHighlighted ? styles.verseHovered : ""}`}
-                                      onMouseEnter={() => setHoveredVerseId(verseId)}
-                                      onMouseLeave={() => setHoveredVerseId(null)}
+                                      data-selected={isSelected ? "true" : "false"}
+                                      className={`${styles.pageVerse} ${isBlurred ? styles.blurred : styles.revealed} ${isPlaying ? styles.playing : ""} ${isPaused ? styles.paused : ""} ${isSelected ? styles.verseHovered : ""}`}
+                                      onMouseEnter={() => handleVerseMouseEnter(verseId)}
+                                      onMouseLeave={() => handleVerseMouseLeave(verseId)}
                                       onClick={(e) => {
                                         e.stopPropagation();
                                         if (isTestMode) {
@@ -441,7 +523,6 @@ export default function PageView({
                                         } else {
                                           if (selectedVerseId === verseId) {
                                             setSelectedVerseId(null);
-                                            setHoveredVerseId(null);
                                           } else {
                                             setSelectedVerseId(verseId);
                                           }
@@ -537,7 +618,7 @@ export default function PageView({
                   })}
               </div>
               <div className={styles.pageFooter}>
-                <span>{pageNum}</span>
+                <span>{info.pageNumArabic || pageNum}</span>
               </div>
             </div>
           </div>
